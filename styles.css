@@ -14,70 +14,37 @@
   --hero-top-space: 15px;
   --hero-number-text-gap: 5px;
   --hero-text-frame-gap: 25px;
+  --frame-top-box-height: 15px;
 }
 
 /* Project frame media controls
    Keep project-specific frame settings here, in project order.
-   When a project gets a real image later, update its block below. */
+   When a project gets a real image later, update its block below.
+   image-position: background-position for the frame image
+   image-size: background-size for the frame image */
 
-/* Project 01 */
+/* Project 01 - Earth Explorer / 大地探索家 */
 .project-panel[data-project="01"] {
-  --project-frame-image-position: 62% center;
-  --project-frame-image-size: auto 92%;
+  --project-frame-image-position: 100% center;
+  --project-frame-image-size: auto 100%;
 }
 
-/* Project 02 */
+/* Project 02 - Stitch Trace / 针迹 */
 .project-panel[data-project="02"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
+  --project-frame-image-position: 100% center;
+  --project-frame-image-size: auto 110%;
 }
 
-/* Project 03 */
+/* Project 03 - Utopia: Waterside Residence / 乌托邦:水上静居 */
 .project-panel[data-project="03"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
+  --project-frame-image-position: 100% center;
+  --project-frame-image-size: auto 100%;
 }
 
-/* Project 04 */
+/* Project 04 - Qi: Wind-Field Interactive Cockpit / 气:风场交互座舱 */
 .project-panel[data-project="04"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 05 */
-.project-panel[data-project="05"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 06 */
-.project-panel[data-project="06"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 07 */
-.project-panel[data-project="07"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 08 */
-.project-panel[data-project="08"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 09 */
-.project-panel[data-project="09"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
-}
-
-/* Project 10 */
-.project-panel[data-project="10"] {
-  --project-frame-image-position: center;
-  --project-frame-image-size: cover;
+  --project-frame-image-position: 100% center;
+  --project-frame-image-size: auto 150%;
 }
 
 * {
@@ -326,12 +293,23 @@ body {
   column-gap: 0;
   align-items: stretch;
   min-height: calc(100dvh - 82px + var(--panel-extra-height));
-  border-top: 1px solid var(--rule-strong);
   padding-bottom: 18px;
 }
 
-.project-panel:first-child {
-  border-top: 0;
+.project-panel::after {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  left: 0;
+  z-index: 12;
+  height: 1px;
+  background: var(--rule-strong);
+  content: "";
+  pointer-events: none;
+}
+
+.project-panel:first-child::after {
+  display: none;
 }
 
 .project-panel::before {
@@ -427,13 +405,17 @@ body {
 }
 
 .project-panel--hero .panel-body {
-  padding-top: var(--hero-top-space);
+  position: relative;
+  padding-top: 0;
   grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
+  justify-items: stretch;
   min-height: 0;
 }
 
 .project-panel--hero .panel-frame {
+  grid-column: 1;
+  grid-row: 1;
   height: 100%;
 }
 
@@ -500,6 +482,20 @@ body {
   background: var(--placeholder);
 }
 
+.panel-frame-top-box {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  width: 100%;
+  height: var(--frame-top-box-height);
+  background: var(--paper);
+  pointer-events: none;
+}
+
 .panel-frame--curtain {
   contain: none;
   background-position: var(--project-frame-image-position, center);
@@ -553,6 +549,36 @@ body {
 
 .frame-earth-explorer::before,
 .frame-earth-explorer::after {
+  display: none;
+}
+
+.frame-pinbridge {
+  background-color: var(--placeholder);
+  background-image: url("./Assets/Images/PinBridge-01.png");
+}
+
+.frame-pinbridge::before,
+.frame-pinbridge::after {
+  display: none;
+}
+
+.frame-utopia {
+  background-color: var(--placeholder);
+  background-image: url("./Assets/Images/Utopia-01.jpeg");
+}
+
+.frame-utopia::before,
+.frame-utopia::after {
+  display: none;
+}
+
+.frame-aerosense {
+  background-color: var(--placeholder);
+  background-image: url("./Assets/Images/AeroSense-01.png");
+}
+
+.frame-aerosense::before,
+.frame-aerosense::after {
   display: none;
 }
 
