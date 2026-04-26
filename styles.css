@@ -10,6 +10,9 @@
   --project-number-width: 132px;
   --panel-copy-width: 212px;
   --panel-extra-height: 220px;
+  /* Hero spacing controls for project 01 */
+  --hero-number-text-gap: 5px;
+  --hero-text-frame-gap: 25px;
 }
 
 * {
@@ -298,6 +301,63 @@ body {
   margin-bottom: 0;
 }
 
+.project-panel--hero .panel-meta {
+  display: none;
+}
+
+.project-panel--hero {
+  --hero-sticky-offset: 12px;
+  --hero-top-space: 6px;
+  --hero-sticky-width: calc(var(--project-number-width) + var(--hero-number-text-gap) + var(--panel-copy-width));
+  grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
+  column-gap: var(--hero-text-frame-gap);
+}
+
+.project-panel--hero::before {
+  width: var(--hero-sticky-width);
+}
+
+.project-panel--hero .panel-number-column {
+  top: var(--hero-sticky-offset);
+  display: grid;
+  grid-template-columns: var(--project-number-width) minmax(170px, var(--panel-copy-width));
+  column-gap: var(--hero-number-text-gap);
+  align-items: start;
+  width: var(--hero-sticky-width);
+  padding-top: var(--hero-top-space);
+}
+
+.project-panel--hero .panel-body {
+  padding-top: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 0;
+}
+
+.project-panel--hero .panel-frame {
+  height: 100%;
+}
+
+.project-panel--hero .panel-copy {
+  position: static;
+  max-width: var(--panel-copy-width);
+  padding-top: 0;
+  padding-right: 0;
+  background: transparent;
+}
+
+.project-panel--hero .panel-copy h2 {
+  margin-bottom: 18px;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.project-panel--hero .panel-copy p {
+  line-height: 1.55;
+  color: var(--muted);
+}
+
 .panel-meta {
   position: sticky;
   top: 0;
@@ -339,6 +399,21 @@ body {
   overflow: hidden;
   contain: paint;
   background: var(--placeholder);
+}
+
+.panel-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.panel-frame.has-image::before,
+.panel-frame.has-image::after {
+  display: none;
 }
 
 .panel-frame::before,
@@ -523,6 +598,10 @@ body {
   .panel-copy h2 {
     font-size: 13px;
   }
+
+  .project-panel--hero .panel-copy h2 {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -561,6 +640,20 @@ body {
     max-width: none;
     padding-top: 6px;
     padding-right: 10px;
+  }
+
+  .project-panel--hero .panel-number-column,
+  .project-panel--hero .panel-body {
+    padding-top: 8px;
+  }
+
+  .project-panel--hero {
+    --hero-number-text-gap: 10px;
+    --hero-text-frame-gap: 10px;
+  }
+
+  .project-panel--hero .panel-copy h2 {
+    margin-bottom: 10px;
   }
 
   .panel-frame {
