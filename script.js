@@ -2,6 +2,7 @@ const detailScroll = document.getElementById("detail-scroll");
 const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
+const debugToggle = document.getElementById("debug-toggle");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
@@ -69,6 +70,17 @@ function refreshMeasurements() {
   requestActiveUpdate();
 }
 
+function syncDebugToggle() {
+  if (!debugToggle) {
+    return;
+  }
+
+  debugToggle.setAttribute(
+    "aria-pressed",
+    String(document.body.classList.contains("debug-outlines")),
+  );
+}
+
 indexItems.forEach((item) => {
   item.tabIndex = 0;
 
@@ -98,4 +110,10 @@ detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true })
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("load", refreshMeasurements);
 
+debugToggle?.addEventListener("click", () => {
+  document.body.classList.toggle("debug-outlines");
+  syncDebugToggle();
+});
+
 refreshMeasurements();
+syncDebugToggle();

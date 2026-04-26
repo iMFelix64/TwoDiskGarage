@@ -10,13 +10,34 @@
   --project-number-width: 132px;
   --panel-copy-width: 212px;
   --panel-extra-height: 220px;
-  /* Hero spacing controls for project 01 */
+  /* Shared spacing controls for hero-style project panels */
+  --hero-top-space: 15px;
   --hero-number-text-gap: 5px;
   --hero-text-frame-gap: 25px;
 }
 
 * {
   box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body.debug-outlines * {
+  outline: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+body.debug-outlines *::before,
+body.debug-outlines *::after {
+  outline: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+body.debug-outlines .panel-frame img,
+body.debug-outlines .panel-frame::before,
+body.debug-outlines .panel-frame::after {
+  outline: none;
 }
 
 html,
@@ -199,6 +220,20 @@ body {
   color: var(--muted);
 }
 
+.debug-toggle {
+  border: 1px solid currentColor;
+  padding: 3px 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.debug-toggle[aria-pressed="true"] {
+  color: var(--ink);
+}
+
 .accent {
   color: var(--accent);
 }
@@ -306,11 +341,11 @@ body {
 }
 
 .project-panel--hero {
-  --hero-sticky-offset: 12px;
-  --hero-top-space: 6px;
+  --hero-sticky-offset: 0px;
   --hero-sticky-width: calc(var(--project-number-width) + var(--hero-number-text-gap) + var(--panel-copy-width));
   grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
   column-gap: var(--hero-text-frame-gap);
+  padding-bottom: var(--hero-top-space);
 }
 
 .project-panel--hero::before {
@@ -328,7 +363,7 @@ body {
 }
 
 .project-panel--hero .panel-body {
-  padding-top: 18px;
+  padding-top: var(--hero-top-space);
   grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
   min-height: 0;
@@ -409,6 +444,7 @@ body {
   object-fit: cover;
   object-position: center;
   display: block;
+  outline: none;
 }
 
 .panel-frame.has-image::before,
@@ -436,6 +472,16 @@ body {
     linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 100%),
     linear-gradient(180deg, #595959, #494949);
   background-size: 42px 100%, auto;
+}
+
+.frame-earth-explorer {
+  background:
+    url("./Assets/Images/Earth Explorer-01.jpeg") center / cover no-repeat;
+}
+
+.frame-earth-explorer::before,
+.frame-earth-explorer::after {
+  display: none;
 }
 
 .frame-atlas::before {
