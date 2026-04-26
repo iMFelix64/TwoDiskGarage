@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SYMTY Archive Grid</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="archive-app" aria-label="SYMTY archive layout">
+      <aside class="archive-index">
+        <header class="index-header">
+          <h1>
+            <span>TWO</span>
+            <span>DISK</span>
+            <span>GARAGE</span>
+          </h1>
+        </header>
+
+        <div class="index-meta">
+          <span>INDEX</span>
+          <span>06 / 24</span>
+        </div>
+
+        <ol class="index-list">
+          <li class="index-item is-active" data-project="01">
+            <span class="index-number">01</span>
+            <span class="index-title">ATLAS TYPE SYSTEMS</span>
+            <span class="index-year">2024</span>
+          </li>
+          <li class="index-item" data-project="02">
+            <span class="index-number">02</span>
+            <span class="index-title">NEUE TERRAIN ARCHIVE</span>
+            <span class="index-year">2023</span>
+          </li>
+          <li class="index-item" data-project="03">
+            <span class="index-number">03</span>
+            <span class="index-title">TRANSIT SIGNAL MANUAL</span>
+            <span class="index-year">2023</span>
+          </li>
+          <li class="index-item" data-project="04">
+            <span class="index-number">04</span>
+            <span class="index-title">CIVIC FORMS LAB</span>
+            <span class="index-year">2022</span>
+          </li>
+          <li class="index-item" data-project="05">
+            <span class="index-number">05</span>
+            <span class="index-title">MONOLITH SIGNAL GRID</span>
+            <span class="index-year">2022</span>
+          </li>
+          <li class="index-item" data-project="06">
+            <span class="index-number">06</span>
+            <span class="index-title">BUREAU OF QUIET MAPS</span>
+            <span class="index-year">2021</span>
+          </li>
+          <li class="index-item" data-project="07">
+            <span class="index-number">07</span>
+            <span class="index-title">KIOSK INTERFACE STUDIES</span>
+            <span class="index-year">2021</span>
+          </li>
+          <li class="index-item" data-project="08">
+            <span class="index-number">08</span>
+            <span class="index-title">PUBLIC PROGRAMS INDEX</span>
+            <span class="index-year">2020</span>
+          </li>
+          <li class="index-item" data-project="09">
+            <span class="index-number">09</span>
+            <span class="index-title">CITY TEXTURE LIBRARY</span>
+            <span class="index-year">2020</span>
+          </li>
+          <li class="index-item" data-project="10">
+            <span class="index-number">10</span>
+            <span class="index-title">WAYFINDING PROTOTYPES</span>
+            <span class="index-year">2019</span>
+          </li>
+        </ol>
+
+        <footer class="index-footer">
+          <nav class="footer-links" aria-label="Archive footer">
+            <a href="#">ABOUT</a>
+            <a href="#">NOTE</a>
+            <a href="#">SEARCH</a>
+          </nav>
+          <p>&copy; SYMTY 2024</p>
+        </footer>
+      </aside>
+
+      <section class="archive-detail" aria-label="Archive detail grid">
+        <header class="detail-toolbar">
+          <div class="detail-path">
+            <span>ARCHIVE /</span>
+            <span class="accent" id="current-project">01</span>
+          </div>
+
+          <nav class="detail-views" aria-label="View mode">
+            <a href="#">GRID</a>
+            <a href="#">LIST</a>
+          </nav>
+        </header>
+
+        <div class="detail-scroll" id="detail-scroll" aria-label="Archive project stream">
+          <div class="detail-track" id="detail-track">
+            <article class="project-panel is-active" data-project="01" aria-label="Atlas Type Systems">
+              <div class="panel-number-column">
+                <p class="band-number">17.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>ATLAS TYPE SYSTEMS</span>
+                  <span>POSTER GRID / 2024</span>
+                </div>
+                <div class="panel-frame frame-atlas" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="02" aria-label="Neue Terrain Archive">
+              <div class="panel-number-column">
+                <p class="band-number">09.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>NEUE TERRAIN ARCHIVE</span>
+                  <span>IMAGE INDEX / 2023</span>
+                </div>
+                <div class="panel-frame frame-terrain" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="03" aria-label="Transit Signal Manual">
+              <div class="panel-number-column">
+                <p class="band-number">21.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>TRANSIT SIGNAL MANUAL</span>
+                  <span>WAYFINDING / 2023</span>
+                </div>
+                <div class="panel-frame frame-transit" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="04" aria-label="Civic Forms Lab">
+              <div class="panel-number-column">
+                <p class="band-number">04.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>CIVIC FORMS LAB</span>
+                  <span>INTERFACE FORMS / 2022</span>
+                </div>
+                <div class="panel-frame frame-civic" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="05" aria-label="Monolith Signal Grid">
+              <div class="panel-number-column">
+                <p class="band-number">13.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>MONOLITH SIGNAL GRID</span>
+                  <span>SIGNAGE ATLAS / 2022</span>
+                </div>
+                <div class="panel-frame frame-monolith" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="06" aria-label="Bureau of Quiet Maps">
+              <div class="panel-number-column">
+                <p class="band-number">28.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>BUREAU OF QUIET MAPS</span>
+                  <span>CARTOGRAPHIC SYSTEM / 2021</span>
+                </div>
+                <div class="panel-frame frame-maps" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="07" aria-label="Kiosk Interface Studies">
+              <div class="panel-number-column">
+                <p class="band-number">07.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>KIOSK INTERFACE STUDIES</span>
+                  <span>PUBLIC TERMINALS / 2021</span>
+                </div>
+                <div class="panel-frame frame-kiosk" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="08" aria-label="Public Programs Index">
+              <div class="panel-number-column">
+                <p class="band-number">31.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>PUBLIC PROGRAMS INDEX</span>
+                  <span>EDITORIAL SYSTEM / 2020</span>
+                </div>
+                <div class="panel-frame frame-programs" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="09" aria-label="City Texture Library">
+              <div class="panel-number-column">
+                <p class="band-number">12.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>CITY TEXTURE LIBRARY</span>
+                  <span>MATERIAL INDEX / 2020</span>
+                </div>
+                <div class="panel-frame frame-city" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="project-panel" data-project="10" aria-label="Wayfinding Prototypes">
+              <div class="panel-number-column">
+                <p class="band-number">15.</p>
+              </div>
+              <div class="panel-content">
+                <div class="panel-meta">
+                  <span>WAYFINDING PROTOTYPES</span>
+                  <span>DIRECTIONAL STUDIES / 2019</span>
+                </div>
+                <div class="panel-frame frame-wayfinding" aria-hidden="true"></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
