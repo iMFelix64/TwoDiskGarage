@@ -16,6 +16,70 @@
   --hero-text-frame-gap: 25px;
 }
 
+/* Project frame media controls
+   Keep project-specific frame settings here, in project order.
+   When a project gets a real image later, update its block below. */
+
+/* Project 01 */
+.project-panel[data-project="01"] {
+  --project-frame-image-position: 62% center;
+  --project-frame-image-size: auto 92%;
+}
+
+/* Project 02 */
+.project-panel[data-project="02"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 03 */
+.project-panel[data-project="03"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 04 */
+.project-panel[data-project="04"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 05 */
+.project-panel[data-project="05"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 06 */
+.project-panel[data-project="06"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 07 */
+.project-panel[data-project="07"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 08 */
+.project-panel[data-project="08"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 09 */
+.project-panel[data-project="09"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
+/* Project 10 */
+.project-panel[data-project="10"] {
+  --project-frame-image-position: center;
+  --project-frame-image-size: cover;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -436,6 +500,14 @@ body {
   background: var(--placeholder);
 }
 
+.panel-frame--curtain {
+  contain: none;
+  background-position: var(--project-frame-image-position, center);
+  background-size: var(--project-frame-image-size, cover);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 .panel-frame img {
   position: absolute;
   inset: 0;
@@ -475,8 +547,8 @@ body {
 }
 
 .frame-earth-explorer {
-  background:
-    url("./Assets/Images/Earth Explorer-01.jpeg") center / cover no-repeat;
+  background-color: var(--placeholder);
+  background-image: url("./Assets/Images/Earth Explorer-01.jpeg");
 }
 
 .frame-earth-explorer::before,
