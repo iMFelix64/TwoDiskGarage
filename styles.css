@@ -11,6 +11,9 @@
   /* 左侧目录栏宽度 */
   --index-column-width: 350px;
 
+  /* 项目展开时左侧目录栏宽度 */
+  --index-column-width-expanded: 220px;
+
   /* 左侧项目高亮块的左缩进 */
   --index-highlight-indent: 44px;
 
@@ -22,6 +25,30 @@
 
   /* 项目数字栏宽度 */
   --project-number-width: 132px;
+
+  /* 项目展开后左侧黄色卡片宽度 */
+  --panel-expanded-card-width: 150px;
+
+  /* 项目展开后左侧黄色卡片高度 */
+  --panel-expanded-card-height: 150px;
+
+  /* 项目展开后右侧说明栏固定宽度 */
+  --panel-expanded-side-width: 300px;
+
+  /* 展开后 frame 与右侧说明栏之间的固定间距 */
+  --panel-expanded-side-gap: 15px;
+
+  /* 左侧目录收起、编号卡片缩小后释放出来的横向空间 */
+  --panel-expanded-released-width: calc(
+    var(--index-column-width) + var(--project-number-width) + var(--panel-copy-width) +
+      var(--hero-number-text-gap) - var(--panel-expanded-card-width)
+  );
+
+  /* 让 frame 和右侧说明栏作为一组平移，而不是改变右侧说明栏宽度 */
+  --panel-expanded-body-offset: calc(
+    var(--panel-expanded-released-width) - var(--panel-expanded-side-width) -
+      var(--panel-expanded-side-gap)
+  );
 
   /* 文字说明区域宽度，值越大，文字区越宽，右侧 frame 会相应变窄 */
   --panel-copy-width: 260px;
@@ -73,18 +100,25 @@
 
   /* 给箭头预留的底部空间，值越大，箭头和上面文字距离越远 */
   --panel-highlight-arrow-reserve: 52px;
+
+  /* 项目卡片展开/收起的统一动效 */
+  --panel-expand-motion: 300ms ease;
 }
 
 /* 项目图片控制区
    按项目顺序排列。
    后面如果某个项目要单独调整图片构图，直接改对应项目这两项：
    --project-frame-image-position：图片在 frame 里的位置
+   --project-frame-anchor-x-expanded / --project-frame-anchor-y-expanded：展开后的 frame 中心标记
    --project-frame-image-size：图片在 frame 里的缩放大小 */
 
 /* Project 01 - Earth Explorer / 大地探索家 */
 .project-panel[data-project="01"] {
   /* 图片位置：先写水平，再写垂直 */
   --project-frame-image-position: 113% center;
+  /* 展开态中心标记位置 */
+  --project-frame-anchor-x-expanded: 15%;
+  --project-frame-anchor-y-expanded: 50%;
   /* 图片大小：auto 100% 表示按高度铺满 */
   --project-frame-image-size: auto 100%;
 }
@@ -92,18 +126,24 @@
 /* Project 02 - Stitch Trace / 针迹 */
 .project-panel[data-project="02"] {
   --project-frame-image-position: 110% center;
+  --project-frame-anchor-x-expanded: 50%;
+  --project-frame-anchor-y-expanded: 50%;
   --project-frame-image-size: auto 110%;
 }
 
 /* Project 03 - Utopia: Waterside Residence / 乌托邦:水上静居 */
 .project-panel[data-project="03"] {
   --project-frame-image-position: 113% center;
+  --project-frame-anchor-x-expanded: 50%;
+  --project-frame-anchor-y-expanded: 50%;
   --project-frame-image-size: auto 100%;
 }
 
 /* Project 04 - Qi: Wind-Field Interactive Cockpit / 气:风场交互座舱 */
 .project-panel[data-project="04"] {
   --project-frame-image-position: 113% center;
+  --project-frame-anchor-x-expanded: 50%;
+  --project-frame-anchor-y-expanded: 50%;
   --project-frame-image-size: auto 150%;
 }
 
@@ -147,8 +187,7 @@ body {
 }
 
 .archive-app {
-  display: grid;
-  grid-template-columns: var(--index-column-width) minmax(0, 1fr);
+  position: relative;
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
@@ -159,6 +198,11 @@ body {
 }
 
 .archive-index {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--index-column-width);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -167,10 +211,21 @@ body {
   overflow: auto;
   background: var(--paper);
   scrollbar-width: none;
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    transform var(--panel-expand-motion),
+    opacity 320ms ease;
 }
 
 .archive-index::-webkit-scrollbar {
   display: none;
+}
+
+.archive-app.is-panel-expanded .archive-index {
+  transform: translateX(calc(-100% - 24px));
+  opacity: 0;
+  pointer-events: none;
 }
 
 .index-header {
@@ -387,9 +442,16 @@ body {
   flex-direction: column;
   min-height: 0;
   min-width: 0;
+  height: 100%;
+  margin-left: var(--index-column-width);
   padding: 24px 10px 15px 10px;
   overflow: hidden;
   background: var(--paper);
+  transition: margin-left var(--panel-expand-motion);
+}
+
+.archive-app.is-panel-expanded .archive-detail {
+  margin-left: 0;
 }
 
 .detail-toolbar {
@@ -450,6 +512,10 @@ body {
   display: none;
 }
 
+.archive-app.is-panel-expanded .detail-scroll {
+  overflow: hidden;
+}
+
 .detail-track {
   position: relative;
 }
@@ -462,6 +528,16 @@ body {
   align-items: stretch;
   min-height: calc(100dvh - 82px + var(--panel-extra-height));
   padding-bottom: 18px;
+}
+
+.archive-app.is-panel-expanded .project-panel {
+  display: none;
+}
+
+.archive-app.is-panel-expanded .project-panel.is-expanded {
+  display: grid;
+  min-height: calc(100dvh - 82px);
+  padding-bottom: 0;
 }
 
 .project-panel::after {
@@ -564,10 +640,12 @@ body {
   grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
   column-gap: var(--hero-text-frame-gap);
   padding-bottom: var(--hero-top-space);
+  transition: grid-template-columns var(--panel-expand-motion);
 }
 
 .project-panel--hero::before {
   width: var(--hero-sticky-width);
+  transition: width var(--panel-expand-motion);
 }
 
 .project-panel--hero .panel-number-column {
@@ -575,6 +653,7 @@ body {
   display: block;
   width: var(--hero-sticky-width);
   padding-top: var(--hero-top-space);
+  transition: width var(--panel-expand-motion);
 }
 
 .panel-highlight-card {
@@ -584,20 +663,25 @@ body {
   column-gap: var(--hero-number-text-gap);
   align-items: start;
   width: 100%;
-  min-height: var(--panel-highlight-min-height);
+  height: var(--panel-highlight-min-height);
+  min-height: 0;
+  border: 0;
   padding:
     var(--panel-highlight-padding-top)
     var(--panel-highlight-padding-right)
     calc(var(--panel-highlight-padding-bottom) + var(--panel-highlight-arrow-reserve))
     var(--panel-highlight-padding-left);
-  border: 0;
   background: transparent;
   box-shadow: none;
   cursor: pointer;
+  appearance: none;
+  overflow: hidden;
+  text-align: left;
   transition:
-    background-color 220ms ease,
-    box-shadow 220ms ease,
-    transform 220ms ease;
+    height var(--panel-expand-motion),
+    background-color 320ms ease,
+    box-shadow 320ms ease,
+    transform 320ms ease;
 }
 
 .panel-number-column:hover .panel-highlight-card,
@@ -616,7 +700,7 @@ body {
   background: url("./Assets/Icons/Arrow.svg") center / contain no-repeat;
   transform: rotate(45deg);
   transform-origin: center;
-  transition: transform 220ms ease;
+  transition: transform 320ms ease;
 }
 
 .panel-number-column:hover .panel-highlight-arrow,
@@ -628,11 +712,14 @@ body {
 
 .project-panel--hero .panel-body {
   position: relative;
+  width: calc(100% + var(--panel-expanded-side-width) + var(--panel-expanded-side-gap));
   padding-top: 0;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) var(--panel-expanded-side-width);
+  column-gap: var(--panel-expanded-side-gap);
   align-items: stretch;
   justify-items: stretch;
   min-height: 0;
+  transition: width var(--panel-expand-motion);
 }
 
 .project-panel--hero .panel-frame {
@@ -647,6 +734,12 @@ body {
   padding-top: 0;
   padding-right: 0;
   background: transparent;
+  opacity: 1;
+  overflow: hidden;
+  transition:
+    max-width 360ms ease,
+    opacity 260ms ease,
+    transform 360ms ease;
 }
 
 .project-panel--hero .panel-copy h2 {
@@ -703,7 +796,7 @@ body {
   min-height: var(--panel-frame-min-height);
   overflow: hidden;
   contain: paint;
-  background: var(--placeholder);
+  background: transparent;
 }
 
 .panel-frame-top-box {
@@ -720,12 +813,150 @@ body {
   pointer-events: none;
 }
 
-.panel-frame--curtain {
+.panel-frame-shell {
+  position: relative;
+  min-width: 0;
+}
+
+.panel-frame-scroll {
+  position: relative;
+  height: 100%;
+  min-height: var(--panel-frame-min-height);
+  overflow: hidden;
+  background: #fff;
+}
+
+.panel-frame-scroll::before,
+.panel-frame-scroll::after {
+  position: absolute;
+  z-index: 4;
+  left: var(--project-frame-anchor-x-expanded, 50%);
+  top: var(--project-frame-anchor-y-expanded, 50%);
+  display: none;
+  background: var(--accent);
+  content: "";
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.panel-frame-scroll::before {
+  width: 34px;
+  height: 1px;
+}
+
+.panel-frame-scroll::after {
+  width: 1px;
+  height: 34px;
+}
+
+.project-panel.is-expanded .panel-frame-scroll::before,
+.project-panel.is-expanded .panel-frame-scroll::after {
+  display: block;
+}
+
+.panel-frame-stage {
+  min-height: var(--panel-frame-min-height);
+  background-color: var(--placeholder);
+}
+
+.panel-frame-stage--curtain {
   contain: none;
   background-position: var(--project-frame-image-position, center);
   background-size: var(--project-frame-image-size, cover);
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+.project-panel.is-frame-image-frozen .panel-frame-stage--curtain {
+  background-position: var(--project-frame-image-position-frozen, var(--project-frame-image-position, center));
+  background-size: var(--project-frame-image-size-frozen, var(--project-frame-image-size, cover));
+  background-attachment: scroll;
+}
+
+.panel-frame-gallery {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0;
+  transition:
+    max-height 420ms ease,
+    opacity 280ms ease,
+    padding-top 420ms ease;
+}
+
+.panel-frame-gallery-label {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 18px;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.panel-frame-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 0 32px 32px;
+}
+
+.panel-frame-detail-card {
+  min-height: 168px;
+  padding: 16px;
+  background: #f3f2ed;
+}
+
+.panel-frame-detail-card h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.panel-frame-detail-card p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.76);
+}
+
+.panel-side-copy {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  min-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(48px);
+  pointer-events: none;
+  transition:
+    opacity 280ms ease,
+    transform 420ms ease;
+}
+
+.panel-side-copy::before {
+  display: block;
+  height: var(--frame-top-box-height);
+  background: var(--paper);
+  content: "";
+}
+
+.panel-side-copy h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.panel-side-copy p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .panel-frame img {
@@ -804,6 +1035,89 @@ body {
 .frame-aerosense::before,
 .frame-aerosense::after {
   display: none;
+}
+
+.project-panel.is-expanded {
+  --hero-sticky-width: calc(var(--panel-expanded-card-width) + 0px);
+}
+
+.project-panel.is-expanded .panel-number-column {
+  width: var(--hero-sticky-width);
+}
+
+.project-panel.is-expanded .panel-highlight-card {
+  height: var(--panel-expanded-card-height);
+  padding:
+    var(--panel-highlight-padding-top)
+    var(--panel-highlight-padding-right)
+    calc(var(--panel-highlight-padding-bottom) + var(--panel-highlight-arrow-reserve))
+    var(--panel-highlight-padding-left);
+  grid-template-columns: 1fr;
+  justify-items: start;
+  background: transparent;
+}
+
+.project-panel.is-expanded .band-number {
+  margin: -5px 0 0;
+}
+
+.project-panel.is-expanded .panel-highlight-card .panel-copy {
+  display: none;
+}
+
+.project-panel.is-copy-deferred .panel-highlight-card .panel-copy {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.project-panel.is-expanded .panel-highlight-arrow {
+  transform: rotate(225deg);
+  right: 12px;
+  bottom: 12px;
+  width: 34px;
+  height: 34px;
+}
+
+.project-panel.is-expanded .panel-highlight-card:hover,
+.project-panel.is-expanded .panel-highlight-card:focus-visible {
+  background: var(--panel-highlight-active);
+}
+
+.project-panel.is-expanded .panel-highlight-card:hover .panel-highlight-arrow,
+.project-panel.is-expanded .panel-highlight-card:focus-visible .panel-highlight-arrow {
+  transform: rotate(180deg);
+}
+
+.project-panel.is-expanded .panel-body {
+  width: calc(100% - var(--panel-expanded-body-offset));
+  grid-template-columns: minmax(0, 1fr) var(--panel-expanded-side-width);
+  column-gap: var(--panel-expanded-side-gap);
+}
+
+.project-panel.is-expanded .panel-frame-scroll {
+  min-height: var(--panel-frame-min-height);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.project-panel.is-expanded .panel-frame-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.project-panel.is-expanded .panel-frame-stage--curtain {
+  background-attachment: scroll;
+}
+
+.project-panel.is-expanded .panel-frame-gallery {
+  max-height: 1200px;
+  opacity: 1;
+  padding-top: 18px;
+}
+
+.project-panel.is-expanded .panel-side-copy {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 .frame-atlas::before {

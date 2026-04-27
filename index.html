@@ -87,7 +87,7 @@
           <div class="detail-track" id="detail-track">
             <article class="project-panel project-panel--hero is-active" data-project="01" aria-label="Atlas Type Systems">
               <div class="panel-number-column">
-                <div class="panel-highlight-card">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
                   <p class="band-number">01.</p>
                   <div class="panel-copy">
                     <h2>大地探索家</h2>
@@ -96,7 +96,7 @@
                     </p>
                   </div>
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
-                </div>
+                </button>
               </div>
               <div class="panel-content">
                 <div class="panel-meta">
@@ -104,15 +104,50 @@
                   <span>POSTER GRID / 2024</span>
                 </div>
                 <div class="panel-body">
-                  <span class="panel-frame-top-box" aria-hidden="true"></span>
-                  <div class="panel-frame panel-frame--curtain frame-earth-explorer" aria-hidden="true"></div>
+                  <div class="panel-frame-shell">
+                    <span class="panel-frame-top-box" aria-hidden="true"></span>
+                    <div class="panel-frame">
+                      <div class="panel-frame-scroll">
+                        <section
+                          class="panel-frame-stage panel-frame-stage--curtain frame-earth-explorer"
+                          aria-hidden="true"
+                        ></section>
+                        <section class="panel-frame-gallery" aria-label="大地探索家扩展内容">
+                          <div class="panel-frame-gallery-label">
+                            <span>项目内容 /</span>
+                            <span>可滚动展示区</span>
+                          </div>
+                          <div class="panel-frame-gallery-grid">
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 01</h3>
+                              <p>这里可以加入大图、过程图或更长的项目说明，展开后在 frame 内部滚动浏览。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 02</h3>
+                              <p>后续如果你补充图片，只需要把新的模块继续放在这个滚动区域里，不影响卡片交互。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 03</h3>
+                              <p>也可以在这里加入短视频封面、材料图或项目拆解段落，让详情页保持纵向延展。</p>
+                            </article>
+                          </div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="panel-side-copy" aria-hidden="true">
+                    <h3>大地探索家</h3>
+                    <p>
+                      受哈苏美学启发的多模式照明设备。兼顾了户外探索的照明安全与专业拍摄的补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。
+                    </p>
+                  </aside>
                 </div>
               </div>
             </article>
 
             <article class="project-panel project-panel--hero" data-project="02" aria-label="Neue Terrain Archive">
               <div class="panel-number-column">
-                <div class="panel-highlight-card">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
                   <p class="band-number">02.</p>
                   <div class="panel-copy">
                     <h2>针迹</h2>
@@ -121,7 +156,7 @@
                     </p>
                   </div>
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
-                </div>
+                </button>
               </div>
               <div class="panel-content">
                 <div class="panel-meta">
@@ -129,15 +164,50 @@
                   <span>IMAGE INDEX / 2023</span>
                 </div>
                 <div class="panel-body">
-                  <span class="panel-frame-top-box" aria-hidden="true"></span>
-                  <div class="panel-frame panel-frame--curtain frame-pinbridge" aria-hidden="true"></div>
+                  <div class="panel-frame-shell">
+                    <span class="panel-frame-top-box" aria-hidden="true"></span>
+                    <div class="panel-frame">
+                      <div class="panel-frame-scroll">
+                        <section
+                          class="panel-frame-stage panel-frame-stage--curtain frame-pinbridge"
+                          aria-hidden="true"
+                        ></section>
+                        <section class="panel-frame-gallery" aria-label="针迹扩展内容">
+                          <div class="panel-frame-gallery-label">
+                            <span>项目内容 /</span>
+                            <span>可滚动展示区</span>
+                          </div>
+                          <div class="panel-frame-gallery-grid">
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 01</h3>
+                              <p>这里可以继续加入穿戴设备记录、骑手叙事片段、过程截图或补充图像资料。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 02</h3>
+                              <p>展开后 `frame` 会保持独立滚动，适合容纳长图、信息图和多段补充说明。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 03</h3>
+                              <p>你后续想加图时，可以直接替换这些占位卡或继续往下追加新的内容块。</p>
+                            </article>
+                          </div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="panel-side-copy" aria-hidden="true">
+                    <h3>针迹</h3>
+                    <p>
+                      通过可穿戴硬件记录外卖骑手的劳动轨迹与个人叙事，以此对抗算法系统的“隐形化”困境，并重塑其在数字化时代下的个体尊严与社会价值。
+                    </p>
+                  </aside>
                 </div>
               </div>
             </article>
 
             <article class="project-panel project-panel--hero" data-project="03" aria-label="Transit Signal Manual">
               <div class="panel-number-column">
-                <div class="panel-highlight-card">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
                   <p class="band-number">03.</p>
                   <div class="panel-copy">
                     <h2>乌托邦:水上静居</h2>
@@ -146,7 +216,7 @@
                     </p>
                   </div>
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
-                </div>
+                </button>
               </div>
               <div class="panel-content">
                 <div class="panel-meta">
@@ -154,15 +224,50 @@
                   <span>WAYFINDING / 2023</span>
                 </div>
                 <div class="panel-body">
-                  <span class="panel-frame-top-box" aria-hidden="true"></span>
-                  <div class="panel-frame panel-frame--curtain frame-utopia" aria-hidden="true"></div>
+                  <div class="panel-frame-shell">
+                    <span class="panel-frame-top-box" aria-hidden="true"></span>
+                    <div class="panel-frame">
+                      <div class="panel-frame-scroll">
+                        <section
+                          class="panel-frame-stage panel-frame-stage--curtain frame-utopia"
+                          aria-hidden="true"
+                        ></section>
+                        <section class="panel-frame-gallery" aria-label="乌托邦:水上静居扩展内容">
+                          <div class="panel-frame-gallery-label">
+                            <span>项目内容 /</span>
+                            <span>可滚动展示区</span>
+                          </div>
+                          <div class="panel-frame-gallery-grid">
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 01</h3>
+                              <p>这里适合放置船体外观、空间布局、材料节点或体验流程等系列图像内容。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 02</h3>
+                              <p>你后面补图时，可以一格放图，一格放说明，让这个详情区像项目板一样继续生长。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 03</h3>
+                              <p>展开状态下的 `frame` 内部滚动不会影响左侧导航和上方工具栏的位置关系。</p>
+                            </article>
+                          </div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="panel-side-copy" aria-hidden="true">
+                    <h3>乌托邦:水上静居</h3>
+                    <p>
+                      受逆戟鲸仿生美学启发的先锋居住空间概念游艇。在 20 米级船身内平衡了极致的动力学流线外观与现代居住空间，探索了未来海上生活的新形态。
+                    </p>
+                  </aside>
                 </div>
               </div>
             </article>
 
             <article class="project-panel project-panel--hero" data-project="04" aria-label="Civic Forms Lab">
               <div class="panel-number-column">
-                <div class="panel-highlight-card">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
                   <p class="band-number">04.</p>
                   <div class="panel-copy">
                     <h2>气:风场交互座舱</h2>
@@ -171,7 +276,7 @@
                     </p>
                   </div>
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
-                </div>
+                </button>
               </div>
               <div class="panel-content">
                 <div class="panel-meta">
@@ -179,8 +284,43 @@
                   <span>INTERFACE FORMS / 2022</span>
                 </div>
                 <div class="panel-body">
-                  <span class="panel-frame-top-box" aria-hidden="true"></span>
-                  <div class="panel-frame panel-frame--curtain frame-aerosense" aria-hidden="true"></div>
+                  <div class="panel-frame-shell">
+                    <span class="panel-frame-top-box" aria-hidden="true"></span>
+                    <div class="panel-frame">
+                      <div class="panel-frame-scroll">
+                        <section
+                          class="panel-frame-stage panel-frame-stage--curtain frame-aerosense"
+                          aria-hidden="true"
+                        ></section>
+                        <section class="panel-frame-gallery" aria-label="气:风场交互座舱扩展内容">
+                          <div class="panel-frame-gallery-label">
+                            <span>项目内容 /</span>
+                            <span>可滚动展示区</span>
+                          </div>
+                          <div class="panel-frame-gallery-grid">
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 01</h3>
+                              <p>这里后续可以加入座舱界面、风场路径图、原型测试照片和交互逻辑说明。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 02</h3>
+                              <p>展开后 `frame` 的横向空间会更宽，适合放比较大的图像和跨栏式的信息布局。</p>
+                            </article>
+                            <article class="panel-frame-detail-card">
+                              <h3>内容占位 03</h3>
+                              <p>如果需要，你后面也可以把这部分替换成完整的图片瀑布流或模块化详情页结构。</p>
+                            </article>
+                          </div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="panel-side-copy" aria-hidden="true">
+                    <h3>气:风场交互座舱</h3>
+                    <p>
+                      探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。
+                    </p>
+                  </aside>
                 </div>
               </div>
             </article>
