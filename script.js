@@ -3,28 +3,41 @@ const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
+const homeButton = document.getElementById("index-home-button");
+const projectGroup = document.getElementById("index-project-group");
+const projectToggle = document.getElementById("index-project-toggle");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
 let panelOffsets = [];
-let activeProjectId = "";
+let visibleProjectId = "";
+let selectedProjectId = "";
 let ticking = false;
 
-function syncActiveProject(activeId) {
-  if (activeProjectId === activeId) {
+function syncSelectedProject(selectedId) {
+  if (selectedProjectId === selectedId) {
     return;
   }
 
-  panelByProject.get(activeProjectId)?.classList.remove("is-active");
-  itemByProject.get(activeProjectId)?.classList.remove("is-active");
-  panelByProject.get(activeId)?.classList.add("is-active");
-  itemByProject.get(activeId)?.classList.add("is-active");
+  itemByProject.get(selectedProjectId)?.classList.remove("is-active");
+  itemByProject.get(selectedId)?.classList.add("is-active");
 
-  if (currentProject) {
-    currentProject.textContent = activeId;
+  selectedProjectId = selectedId;
+}
+
+function syncVisibleProject(visibleId) {
+  if (visibleProjectId === visibleId) {
+    return;
   }
 
-  activeProjectId = activeId;
+  panelByProject.get(visibleProjectId)?.classList.remove("is-active");
+  panelByProject.get(visibleId)?.classList.add("is-active");
+
+  if (currentProject) {
+    currentProject.textContent = visibleId;
+  }
+
+  visibleProjectId = visibleId;
 }
 
 function measureProjectOffsets() {
@@ -49,7 +62,7 @@ function updateActiveProject() {
     }
   }
 
-  syncActiveProject(activeId);
+  syncVisibleProject(activeId);
 }
 
 function requestActiveUpdate() {
@@ -91,6 +104,7 @@ indexItems.forEach((item) => {
   }
 
   const scrollToPanel = () => {
+    syncSelectedProject(item.dataset.project);
     targetPanel.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -110,10 +124,25 @@ detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true })
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("load", refreshMeasurements);
 
+homeButton?.addEventListener("click", () => {
+  syncSelectedProject(projectPanels[0]?.dataset.project || "01");
+  detailScroll?.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+});
+
+projectToggle?.addEventListener("click", () => {
+  const isCollapsed = projectGroup?.classList.toggle("is-collapsed");
+
+  projectToggle.setAttribute("aria-expanded", String(!isCollapsed));
+});
+
 debugToggle?.addEventListener("click", () => {
   document.body.classList.toggle("debug-outlines");
   syncDebugToggle();
 });
 
+syncSelectedProject(indexItems[0]?.dataset.project || "01");
 refreshMeasurements();
 syncDebugToggle();
