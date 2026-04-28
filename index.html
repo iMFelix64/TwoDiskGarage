@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="archive-app" aria-label="SYMTY archive layout">
-      <aside class="archive-index">
-        <header class="index-header">
+    <main class="archive-app" aria-label="SYMTY archive layout" data-debug-label="main.archive-app">
+      <aside class="archive-index" data-debug-label="aside.archive-index">
+        <header class="index-header" data-debug-label="header.index-header">
           <h1>
             <span>TWO</span>
             <span>DISK</span>
@@ -17,8 +17,8 @@
           </h1>
         </header>
 
-        <nav class="index-nav" aria-label="Archive menu">
-          <button class="index-link index-link--primary" id="index-home-button" type="button">
+        <nav class="index-nav" aria-label="Archive menu" data-debug-label="nav.index-nav">
+          <button class="index-link index-link--primary" id="index-home-button" type="button" data-debug-label="button#index-home-button">
             <span class="index-link-label">首页</span>
           </button>
 
@@ -26,68 +26,74 @@
             class="index-group is-collapsed"
             id="index-project-group"
             aria-labelledby="index-project-toggle"
+            data-debug-label="section#index-project-group"
           >
             <button
               class="index-group-toggle"
               id="index-project-toggle"
               type="button"
               aria-expanded="false"
+              data-debug-label="button#index-project-toggle"
             >
               <span class="index-group-label">项目</span>
               <span class="index-group-arrow" aria-hidden="true"></span>
             </button>
 
-            <ol class="index-list">
+            <ol class="index-list" data-debug-label="ol.index-list">
               <li
                 class="index-item is-active"
                 data-project="01"
                 aria-label="项目 01 大地探索家"
+                data-debug-label="li.index-item[01]"
               >
                 <span class="index-item-label">01</span>
                 <span class="index-item-dot" aria-hidden="true"></span>
               </li>
-              <li class="index-item" data-project="02" aria-label="项目 02 针迹">
+              <li class="index-item" data-project="02" aria-label="项目 02 针迹" data-debug-label="li.index-item[02]">
                 <span class="index-item-label">02</span>
                 <span class="index-item-dot" aria-hidden="true"></span>
               </li>
-              <li class="index-item" data-project="03" aria-label="项目 03 乌托邦:水上静居">
+              <li class="index-item" data-project="03" aria-label="项目 03 乌托邦:水上静居" data-debug-label="li.index-item[03]">
                 <span class="index-item-label">03</span>
                 <span class="index-item-dot" aria-hidden="true"></span>
               </li>
-              <li class="index-item" data-project="04" aria-label="项目 04 气:风场交互座舱">
+              <li class="index-item" data-project="04" aria-label="项目 04 气:风场交互座舱" data-debug-label="li.index-item[04]">
                 <span class="index-item-label">04</span>
                 <span class="index-item-dot" aria-hidden="true"></span>
               </li>
             </ol>
           </section>
 
-          <button class="index-link" id="index-about-button" type="button">
+          <button class="index-link" id="index-about-button" type="button" data-debug-label="button#index-about-button">
             <span class="index-link-label">关于我</span>
           </button>
         </nav>
       </aside>
 
-      <section class="archive-detail" aria-label="Archive detail grid">
-        <header class="detail-toolbar">
-          <div class="detail-path">
+      <section class="archive-detail" aria-label="Archive detail grid" data-debug-label="section.archive-detail">
+        <header class="detail-toolbar" data-debug-label="header.detail-toolbar">
+          <div class="detail-path" data-debug-label="div.detail-path">
             <span>ARCHIVE /</span>
             <span class="accent" id="current-project">01</span>
           </div>
 
-          <nav class="detail-views" aria-label="View mode">
+          <nav class="detail-views" aria-label="View mode" data-debug-label="nav.detail-views">
             <button class="debug-toggle" id="debug-toggle" type="button" aria-pressed="false">
               OUTLINE
+            </button>
+            <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
+              LABELS
             </button>
             <a href="#">GRID</a>
             <a href="#">LIST</a>
           </nav>
         </header>
 
-        <div class="detail-scroll" id="detail-scroll" aria-label="Archive project stream">
-          <div class="detail-track" id="detail-track">
-            <article class="project-panel project-panel--hero is-active" data-project="01" aria-label="Atlas Type Systems">
-              <div class="panel-number-column">
-                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
+        <div class="detail-scroll" id="detail-scroll" aria-label="Archive project stream" data-debug-label="div#detail-scroll">
+          <div class="detail-track" id="detail-track" data-debug-label="div#detail-track">
+            <article class="project-panel project-panel--hero is-active" data-project="01" aria-label="Atlas Type Systems" data-debug-label="article.project-panel[01]">
+              <div class="panel-number-column" data-debug-label="div.panel-number-column">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false" data-debug-label="button.panel-highlight-card">
                   <p class="band-number">01.</p>
                   <div class="panel-copy">
                     <h2>大地探索家</h2>
@@ -98,23 +104,24 @@
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
                 </button>
               </div>
-              <div class="panel-content">
-                <div class="panel-meta">
+              <div class="panel-content" data-debug-label="div.panel-content">
+                <div class="panel-meta" data-debug-label="div.panel-meta">
                   <span>ATLAS TYPE SYSTEMS</span>
                   <span>POSTER GRID / 2024</span>
                 </div>
-                <div class="panel-body">
-                  <div class="panel-frame-shell">
+                <div class="panel-body" data-debug-label="div.panel-body">
+                  <div class="panel-frame-shell" data-debug-label="div.panel-frame-shell">
                     <span class="panel-frame-top-box" aria-hidden="true"></span>
-                    <div class="panel-frame">
-                      <div class="panel-frame-scroll">
+                    <div class="panel-frame" data-debug-label="div.panel-frame">
+                      <div class="panel-frame-scroll" data-debug-label="div.panel-frame-scroll">
                         <section
                           class="panel-frame-stage panel-frame-stage--curtain frame-earth-explorer"
                           aria-hidden="true"
+                          data-debug-label="section.panel-frame-stage"
                         ></section>
-                        <section class="panel-frame-gallery" aria-label="大地探索家扩展内容">
-                          <div class="panel-frame-gallery-stack">
-                            <figure class="panel-frame-gallery-image">
+                        <section class="panel-frame-gallery" aria-label="大地探索家扩展内容" data-debug-label="section.panel-frame-gallery">
+                          <div class="panel-frame-gallery-stack" data-debug-label="div.panel-frame-gallery-stack">
+                            <figure class="panel-frame-gallery-image" data-debug-label="figure.panel-frame-gallery-image">
                               <img src="./Assets/Project 01/1-EARTH EXPLORER 02.jpg" alt="大地探索家项目图片 02" loading="lazy" />
                             </figure>
                             <figure class="panel-frame-gallery-image">
@@ -140,7 +147,7 @@
                       </div>
                     </div>
                   </div>
-                  <aside class="panel-side-copy" aria-hidden="true">
+                  <aside class="panel-side-copy" aria-hidden="true" data-debug-label="aside.panel-side-copy">
                     <h3>大地探索家</h3>
                     <p>
                       受哈苏美学启发的多模式照明设备。兼顾了户外探索的照明安全与专业拍摄的补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。
@@ -150,9 +157,9 @@
               </div>
             </article>
 
-            <article class="project-panel project-panel--hero" data-project="02" aria-label="Neue Terrain Archive">
-              <div class="panel-number-column">
-                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
+            <article class="project-panel project-panel--hero" data-project="02" aria-label="Neue Terrain Archive" data-debug-label="article.project-panel[02]">
+              <div class="panel-number-column" data-debug-label="div.panel-number-column">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false" data-debug-label="button.panel-highlight-card">
                   <p class="band-number">02.</p>
                   <div class="panel-copy">
                     <h2>针迹</h2>
@@ -163,21 +170,21 @@
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
                 </button>
               </div>
-              <div class="panel-content">
-                <div class="panel-meta">
+              <div class="panel-content" data-debug-label="div.panel-content">
+                <div class="panel-meta" data-debug-label="div.panel-meta">
                   <span>NEUE TERRAIN ARCHIVE</span>
                   <span>IMAGE INDEX / 2023</span>
                 </div>
-                <div class="panel-body">
-                  <div class="panel-frame-shell">
+                <div class="panel-body" data-debug-label="div.panel-body">
+                  <div class="panel-frame-shell" data-debug-label="div.panel-frame-shell">
                     <span class="panel-frame-top-box" aria-hidden="true"></span>
-                    <div class="panel-frame">
-                      <div class="panel-frame-scroll">
+                    <div class="panel-frame" data-debug-label="div.panel-frame">
+                      <div class="panel-frame-scroll" data-debug-label="div.panel-frame-scroll">
                         <section
                           class="panel-frame-stage panel-frame-stage--curtain frame-pinbridge"
                           aria-hidden="true"
                         ></section>
-                        <section class="panel-frame-gallery" aria-label="针迹扩展内容">
+                        <section class="panel-frame-gallery" aria-label="针迹扩展内容" data-debug-label="section.panel-frame-gallery">
                           <div class="panel-frame-gallery-label">
                             <span>项目内容 /</span>
                             <span>可滚动展示区</span>
@@ -200,7 +207,7 @@
                       </div>
                     </div>
                   </div>
-                  <aside class="panel-side-copy" aria-hidden="true">
+                  <aside class="panel-side-copy" aria-hidden="true" data-debug-label="aside.panel-side-copy">
                     <h3>针迹</h3>
                     <p>
                       通过可穿戴硬件记录外卖骑手的劳动轨迹与个人叙事，以此对抗算法系统的“隐形化”困境，并重塑其在数字化时代下的个体尊严与社会价值。
@@ -210,9 +217,9 @@
               </div>
             </article>
 
-            <article class="project-panel project-panel--hero" data-project="03" aria-label="Transit Signal Manual">
-              <div class="panel-number-column">
-                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
+            <article class="project-panel project-panel--hero" data-project="03" aria-label="Transit Signal Manual" data-debug-label="article.project-panel[03]">
+              <div class="panel-number-column" data-debug-label="div.panel-number-column">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false" data-debug-label="button.panel-highlight-card">
                   <p class="band-number">03.</p>
                   <div class="panel-copy">
                     <h2>乌托邦:水上静居</h2>
@@ -223,21 +230,21 @@
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
                 </button>
               </div>
-              <div class="panel-content">
-                <div class="panel-meta">
+              <div class="panel-content" data-debug-label="div.panel-content">
+                <div class="panel-meta" data-debug-label="div.panel-meta">
                   <span>TRANSIT SIGNAL MANUAL</span>
                   <span>WAYFINDING / 2023</span>
                 </div>
-                <div class="panel-body">
-                  <div class="panel-frame-shell">
+                <div class="panel-body" data-debug-label="div.panel-body">
+                  <div class="panel-frame-shell" data-debug-label="div.panel-frame-shell">
                     <span class="panel-frame-top-box" aria-hidden="true"></span>
-                    <div class="panel-frame">
-                      <div class="panel-frame-scroll">
+                    <div class="panel-frame" data-debug-label="div.panel-frame">
+                      <div class="panel-frame-scroll" data-debug-label="div.panel-frame-scroll">
                         <section
                           class="panel-frame-stage panel-frame-stage--curtain frame-utopia"
                           aria-hidden="true"
                         ></section>
-                        <section class="panel-frame-gallery" aria-label="乌托邦:水上静居扩展内容">
+                        <section class="panel-frame-gallery" aria-label="乌托邦:水上静居扩展内容" data-debug-label="section.panel-frame-gallery">
                           <div class="panel-frame-gallery-label">
                             <span>项目内容 /</span>
                             <span>可滚动展示区</span>
@@ -260,7 +267,7 @@
                       </div>
                     </div>
                   </div>
-                  <aside class="panel-side-copy" aria-hidden="true">
+                  <aside class="panel-side-copy" aria-hidden="true" data-debug-label="aside.panel-side-copy">
                     <h3>乌托邦:水上静居</h3>
                     <p>
                       受逆戟鲸仿生美学启发的先锋居住空间概念游艇。在 20 米级船身内平衡了极致的动力学流线外观与现代居住空间，探索了未来海上生活的新形态。
@@ -270,9 +277,9 @@
               </div>
             </article>
 
-            <article class="project-panel project-panel--hero" data-project="04" aria-label="Civic Forms Lab">
-              <div class="panel-number-column">
-                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false">
+            <article class="project-panel project-panel--hero" data-project="04" aria-label="Civic Forms Lab" data-debug-label="article.project-panel[04]">
+              <div class="panel-number-column" data-debug-label="div.panel-number-column">
+                <button class="panel-highlight-card panel-expand-toggle" type="button" aria-expanded="false" data-debug-label="button.panel-highlight-card">
                   <p class="band-number">04.</p>
                   <div class="panel-copy">
                     <h2>气:风场交互座舱</h2>
@@ -283,21 +290,21 @@
                   <span class="panel-highlight-arrow" aria-hidden="true"></span>
                 </button>
               </div>
-              <div class="panel-content">
-                <div class="panel-meta">
+              <div class="panel-content" data-debug-label="div.panel-content">
+                <div class="panel-meta" data-debug-label="div.panel-meta">
                   <span>CIVIC FORMS LAB</span>
                   <span>INTERFACE FORMS / 2022</span>
                 </div>
-                <div class="panel-body">
-                  <div class="panel-frame-shell">
+                <div class="panel-body" data-debug-label="div.panel-body">
+                  <div class="panel-frame-shell" data-debug-label="div.panel-frame-shell">
                     <span class="panel-frame-top-box" aria-hidden="true"></span>
-                    <div class="panel-frame">
-                      <div class="panel-frame-scroll">
+                    <div class="panel-frame" data-debug-label="div.panel-frame">
+                      <div class="panel-frame-scroll" data-debug-label="div.panel-frame-scroll">
                         <section
                           class="panel-frame-stage panel-frame-stage--curtain frame-aerosense"
                           aria-hidden="true"
                         ></section>
-                        <section class="panel-frame-gallery" aria-label="气:风场交互座舱扩展内容">
+                        <section class="panel-frame-gallery" aria-label="气:风场交互座舱扩展内容" data-debug-label="section.panel-frame-gallery">
                           <div class="panel-frame-gallery-label">
                             <span>项目内容 /</span>
                             <span>可滚动展示区</span>
@@ -320,7 +327,7 @@
                       </div>
                     </div>
                   </div>
-                  <aside class="panel-side-copy" aria-hidden="true">
+                  <aside class="panel-side-copy" aria-hidden="true" data-debug-label="aside.panel-side-copy">
                     <h3>气:风场交互座舱</h3>
                     <p>
                       探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。

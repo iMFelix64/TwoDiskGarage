@@ -4,6 +4,7 @@ const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
+const labelToggle = document.getElementById("label-toggle");
 const homeButton = document.getElementById("index-home-button");
 const projectGroup = document.getElementById("index-project-group");
 const projectToggle = document.getElementById("index-project-toggle");
@@ -331,6 +332,57 @@ function syncDebugToggle() {
   );
 }
 
+function syncLabelToggle() {
+  if (!labelToggle) {
+    return;
+  }
+
+  labelToggle.setAttribute(
+    "aria-pressed",
+    String(document.body.classList.contains("debug-labels")),
+  );
+}
+
+function buildDebugLabel(element) {
+  const tagName = element.tagName.toLowerCase();
+  const idPart = element.id ? `#${element.id}` : "";
+  const classList = Array.from(element.classList).filter((className) => !className.startsWith("is-"));
+  const classPart = classList.length ? `.${classList[0]}` : "";
+  const projectPart = element.dataset.project ? `[${element.dataset.project}]` : "";
+
+  return `${tagName}${idPart}${classPart}${projectPart}`;
+}
+
+function applyDebugLabels() {
+  const labelTargets = document.querySelectorAll(
+    "[data-debug-label], main, aside, section, header, nav, article, div, ol, li, figure, button",
+  );
+
+  labelTargets.forEach((element) => {
+    if (!element.dataset.debugLabel) {
+      if (!element.className && !element.id && !element.dataset.project) {
+        return;
+      }
+
+      element.setAttribute("data-debug-label", buildDebugLabel(element));
+    }
+
+    const hasBadge = Array.from(element.children).some(
+      (child) => child.classList.contains("debug-name-badge"),
+    );
+
+    if (hasBadge) {
+      return;
+    }
+
+    const badge = document.createElement("span");
+    badge.className = "debug-name-badge";
+    badge.setAttribute("aria-hidden", "true");
+    badge.textContent = element.dataset.debugLabel;
+    element.insertAdjacentElement("afterbegin", badge);
+  });
+}
+
 function syncExpandedFrameWheel(event) {
   const frameElement = event.currentTarget;
   const parentPanel = frameElement.closest(".project-panel");
@@ -394,6 +446,12 @@ debugToggle?.addEventListener("click", () => {
   syncDebugToggle();
 });
 
+labelToggle?.addEventListener("click", () => {
+  applyDebugLabels();
+  document.body.classList.toggle("debug-labels");
+  syncLabelToggle();
+});
+
 expandToggles.forEach((toggle) => {
   const parentPanel = toggle.closest(".project-panel");
 
@@ -421,5 +479,7 @@ panelFrames.forEach((panelFrame) => {
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
+applyDebugLabels();
 refreshMeasurements();
 syncDebugToggle();
+syncLabelToggle();
