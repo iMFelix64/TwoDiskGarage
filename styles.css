@@ -69,7 +69,10 @@
   --frame-top-box-height: 15px;
 
   /* frame 的最小高度，想把右侧画面整体拉高就改这里 */
-  --panel-frame-min-height: 1200px;
+  --panel-frame-min-height: 600px;
+
+  /* 项目展开后 frame 的固定可视高度，内部内容会在这个窗口里滚动 */
+  --panel-expanded-frame-height: 600px;
 
   /* 文字高亮卡片描边颜色 */
   --panel-highlight-border: rgba(18, 18, 18, 0.12);
@@ -797,6 +800,11 @@ body {
   overflow: hidden;
   contain: paint;
   background: transparent;
+  scrollbar-width: none;
+}
+
+.panel-frame::-webkit-scrollbar {
+  display: none;
 }
 
 .panel-frame-top-box {
@@ -820,9 +828,11 @@ body {
 
 .panel-frame-scroll {
   position: relative;
-  height: 100%;
+  height: auto;
   min-height: var(--panel-frame-min-height);
-  overflow: hidden;
+  overscroll-behavior: contain;
+  pointer-events: none;
+  touch-action: none;
   background: #fff;
 }
 
@@ -878,48 +888,24 @@ body {
   opacity: 0;
   overflow: hidden;
   padding-top: 0;
-  transition:
-    max-height 420ms ease,
-    opacity 280ms ease,
-    padding-top 420ms ease;
 }
 
-.panel-frame-gallery-label {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 18px;
-  font-size: 10px;
-  line-height: 1.4;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.8);
-}
-
-.panel-frame-gallery-grid {
+.panel-frame-gallery-stack {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  padding: 0 32px 32px;
+  padding: 0 0 24px;
 }
 
-.panel-frame-detail-card {
-  min-height: 168px;
-  padding: 16px;
+.panel-frame-gallery-image {
+  margin: 0;
+  width: 100%;
   background: #f3f2ed;
 }
 
-.panel-frame-detail-card h3 {
-  margin: 0 0 10px;
-  font-size: 12px;
-  line-height: 1.4;
-  font-weight: 700;
-}
-
-.panel-frame-detail-card p {
-  margin: 0;
-  font-size: 10px;
-  line-height: 1.6;
-  color: rgba(0, 0, 0, 0.76);
+.panel-frame-gallery-image img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .panel-side-copy {
@@ -959,7 +945,7 @@ body {
   color: rgba(0, 0, 0, 0.8);
 }
 
-.panel-frame img {
+.panel-frame > img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1092,16 +1078,28 @@ body {
   width: calc(100% - var(--panel-expanded-body-offset));
   grid-template-columns: minmax(0, 1fr) var(--panel-expanded-side-width);
   column-gap: var(--panel-expanded-side-gap);
+  height: 100%;
+}
+
+.project-panel.is-expanded .panel-frame-shell,
+.project-panel.is-expanded .panel-frame {
+  height: 100%;
+  min-height: 100%;
+}
+
+.project-panel.is-expanded .panel-frame {
+  overflow-y: auto;
 }
 
 .project-panel.is-expanded .panel-frame-scroll {
-  min-height: var(--panel-frame-min-height);
+  min-height: 100%;
   overflow-y: auto;
-  scrollbar-width: none;
+  pointer-events: auto;
+  touch-action: pan-y;
 }
 
-.project-panel.is-expanded .panel-frame-scroll::-webkit-scrollbar {
-  display: none;
+.project-panel.is-expanded .panel-frame-stage {
+  min-height: var(--panel-frame-min-height);
 }
 
 .project-panel.is-expanded .panel-frame-stage--curtain {
@@ -1109,8 +1107,9 @@ body {
 }
 
 .project-panel.is-expanded .panel-frame-gallery {
-  max-height: 1200px;
+  max-height: none;
   opacity: 1;
+  overflow: visible;
   padding-top: 18px;
 }
 

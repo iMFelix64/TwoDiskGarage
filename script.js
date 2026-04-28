@@ -8,6 +8,8 @@ const homeButton = document.getElementById("index-home-button");
 const projectGroup = document.getElementById("index-project-group");
 const projectToggle = document.getElementById("index-project-toggle");
 const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle"));
+const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
+const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll"));
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
@@ -267,7 +269,8 @@ async function syncExpandedProject(projectId = "") {
     nextPanel?.classList.add("is-expanded");
     nextPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "true");
     nextPanel?.querySelector(".panel-side-copy")?.setAttribute("aria-hidden", "false");
-    nextPanel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+    nextPanel?.querySelector(".panel-frame")?.scrollTo({ top: 0, behavior: "auto" });
+    nextPanel?.querySelector(".panel-frame")?.focus();
   }
 
   archiveApp?.classList.toggle("is-panel-expanded", Boolean(expandedProjectId));
@@ -326,6 +329,19 @@ function syncDebugToggle() {
     "aria-pressed",
     String(document.body.classList.contains("debug-outlines")),
   );
+}
+
+function syncExpandedFrameWheel(event) {
+  const frameElement = event.currentTarget;
+  const parentPanel = frameElement.closest(".project-panel");
+
+  if (!parentPanel?.classList.contains("is-expanded")) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  frameElement.scrollTop += event.deltaY;
 }
 
 indexItems.forEach((item) => {
@@ -397,6 +413,11 @@ expandToggles.forEach((toggle) => {
       block: "start",
     });
   });
+});
+
+panelFrames.forEach((panelFrame) => {
+  panelFrame.tabIndex = -1;
+  panelFrame.addEventListener("wheel", syncExpandedFrameWheel, { passive: false });
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");

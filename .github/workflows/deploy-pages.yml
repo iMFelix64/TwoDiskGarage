@@ -36,6 +36,11 @@ jobs:
           cp index.html _site/
           cp styles.css _site/
           cp script.js _site/
+          cp home.html _site/
+          cp home.css _site/
+          cp home.js _site/
+          cp loading.html _site/
+          cp loading.css _site/
           cp -R Assets _site/
           touch _site/.nojekyll
 
