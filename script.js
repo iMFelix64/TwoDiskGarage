@@ -151,6 +151,41 @@ function animateElementScrollToTop(element, duration = PANEL_RESET_ANIMATION_MS)
   });
 }
 
+function animateDetailScrollToPanel(panel, duration = PANEL_RESET_ANIMATION_MS) {
+  if (!detailScroll || !panel) {
+    return Promise.resolve(false);
+  }
+
+  const start = detailScroll.scrollTop;
+  const target = Math.max(0, panel.offsetTop);
+  const distance = target - start;
+
+  if (Math.abs(distance) <= 1) {
+    detailScroll.scrollTo({ top: target, behavior: "auto" });
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    const startTime = window.performance.now();
+
+    const tick = (timestamp) => {
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+      detailScroll.scrollTop = start + distance * eased;
+
+      if (progress < 1) {
+        window.requestAnimationFrame(tick);
+        return;
+      }
+
+      detailScroll.scrollTop = target;
+      resolve(true);
+    };
+
+    window.requestAnimationFrame(tick);
+  });
+}
+
 async function animateEmbeddedProjectScrollToTop(panel, duration = PANEL_RESET_ANIMATION_MS) {
   const embedFrame = panel?.querySelector(".panel-project-embed-frame");
 
@@ -446,14 +481,25 @@ expandToggles.forEach((toggle) => {
   toggle.addEventListener("click", async () => {
     const projectId = parentPanel.dataset.project;
     const nextExpandedId = expandedProjectId === projectId ? "" : projectId;
+    const isCollapsingCurrentProject = !nextExpandedId;
 
     syncSelectedProject(projectId);
     syncVisibleProject(projectId);
+
+    if (nextExpandedId) {
+      await animateDetailScrollToPanel(parentPanel);
+    }
+
     await syncExpandedProject(nextExpandedId);
-    parentPanel.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+
+    if (isCollapsingCurrentProject) {
+      window.requestAnimationFrame(() => {
+        parentPanel.scrollIntoView({
+          behavior: "auto",
+          block: "start",
+        });
+      });
+    }
   });
 });
 
