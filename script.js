@@ -304,6 +304,11 @@ function updateActiveProject() {
     return;
   }
 
+  if (expandedProjectId) {
+    syncVisibleProject(expandedProjectId);
+    return;
+  }
+
   const scrollTop = detailScroll.scrollTop;
   let activeId = panelOffsets[0]?.id || projectPanels[0].dataset.project;
 
