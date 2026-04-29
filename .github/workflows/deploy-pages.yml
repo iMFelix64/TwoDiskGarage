@@ -39,9 +39,9 @@ jobs:
           cp home.html _site/
           cp home.css _site/
           cp home.js _site/
-          cp loading.html _site/
-          cp loading.css _site/
+          cp project01-gallery.html _site/
           cp -R Assets _site/
+          cp -R projects _site/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact
