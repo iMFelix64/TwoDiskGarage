@@ -33,7 +33,7 @@
   --panel-expanded-card-height: 150px;
 
   /* 项目展开后右侧说明栏固定宽度 */
-  --panel-expanded-side-width: 286px;
+  --panel-expanded-side-width: 318px;
 
   /* 展开后 frame 与右侧说明栏之间的固定间距 */
   --panel-expanded-side-gap: 10px;
@@ -997,6 +997,7 @@ body {
 }
 
 .panel-project-embed {
+  position: relative;
   width: 100%;
   height: 100%;
   min-height: var(--panel-frame-min-height);
@@ -1010,6 +1011,14 @@ body {
   min-height: var(--panel-frame-min-height);
   border: 0;
   background: #fff;
+}
+
+.panel-project-embed-wheel-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  background: transparent;
 }
 
 .panel-frame-shell--gallery-flow {
@@ -1072,12 +1081,14 @@ body {
   position: absolute;
   top: var(--hero-top-space);
   right: 0;
-  display: block;
+  display: grid;
+  gap: 15px;
+  align-content: start;
   width: var(--panel-expanded-side-width);
   height: auto;
   max-height: none;
   min-width: 0;
-  padding: 0 5px;
+  padding: 0 0 8px;
   overflow: hidden;
   background: var(--paper);
   opacity: 0;
@@ -1085,22 +1096,72 @@ body {
   transition:
     opacity var(--panel-layout-motion),
     transform var(--panel-layout-motion);
-}
-
-.panel-side-copy h3 {
-  margin: 0 0 10px;
-  font-size: 15px;
-  line-height: 1.5;
-  font-weight: 700;
-  color: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
 }
 
 .panel-side-copy p {
   margin: 0;
-  font-size: 10px;
+}
+
+.panel-side-copy-kicker {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  color: #000;
+}
+
+.panel-side-copy-title {
+  margin: 0;
+  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 37.5px;
+  line-height: 0.92;
+  font-weight: 700;
+  color: #000;
+}
+
+.panel-side-copy-description {
+  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
   line-height: 1.5;
   font-weight: 300;
   color: rgba(0, 0, 0, 0.8);
+}
+
+.panel-side-copy-rule {
+  display: block;
+  width: 100%;
+  height: 0.5px;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.panel-side-copy-year {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  color: #000;
+}
+
+.panel-side-copy-spec {
+  display: grid;
+  gap: 7.5px;
+}
+
+.panel-side-copy-label {
+  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.panel-side-copy-value {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.05;
+  font-weight: 500;
+  color: #000;
 }
 
 .panel-frame > img {
@@ -1299,6 +1360,10 @@ body {
 .project-panel.is-expanded .panel-project-embed-frame {
   height: var(--panel-expanded-frame-height);
   min-height: var(--panel-expanded-frame-height);
+}
+
+.project-panel.is-expanded .panel-project-embed-wheel-layer {
+  display: block;
 }
 
 .project-panel.is-expanded .panel-frame-scroll--gallery-flow {

@@ -13,6 +13,7 @@ const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
 const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll"));
 const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
+const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
@@ -107,6 +108,27 @@ function resetPanelContentScroll(panel) {
   }
 
   panel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function postScrollToEmbeddedProject(panel, deltaY) {
+  const embedFrame = panel?.querySelector(".panel-project-embed-frame");
+
+  if (!embedFrame?.contentWindow) {
+    return false;
+  }
+
+  try {
+    embedFrame.contentWindow.postMessage(
+      {
+        type: "project-scroll-by",
+        deltaY,
+      },
+      "*",
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function syncExpandedProject(projectId = "") {
@@ -254,6 +276,10 @@ function syncExpandedFrameWheel(event) {
     return;
   }
 
+  if (parentPanel.querySelector(".panel-project-embed-frame")) {
+    return;
+  }
+
   event.preventDefault();
   event.stopPropagation();
   frameScroll.scrollTop += event.deltaY;
@@ -357,6 +383,29 @@ projectEmbedFrames.forEach((embedFrame) => {
       resetPanelContentScroll(parentPanel);
     }
   });
+});
+
+projectEmbedWheelLayers.forEach((wheelLayer) => {
+  wheelLayer.addEventListener(
+    "wheel",
+    (event) => {
+      const parentPanel = wheelLayer.closest(".project-panel");
+
+      if (!parentPanel?.classList.contains("is-expanded")) {
+        return;
+      }
+
+      const didPost = postScrollToEmbeddedProject(parentPanel, event.deltaY);
+
+      if (!didPost) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    { passive: false },
+  );
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
