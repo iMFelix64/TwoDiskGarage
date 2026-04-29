@@ -44,6 +44,9 @@
   /* 项目顶部留白，上下分割线与内容的呼吸感主要由它控制 */
   --hero-top-space: 15px;
 
+  /* 右侧滚动区域 sticky 元素距离视口顶部的实际位置：外框 + toolbar + 15px 留白 */
+  --detail-sticky-top: calc(1px + 24px + 20px + 12px + 1px + var(--hero-top-space));
+
   /* 数字与文字卡片之间的水平间距 */
   --hero-number-text-gap: 0px;
 
@@ -333,6 +336,8 @@ body {
 .index-link-label,
 .index-group-label {
   display: inline-block;
+  font-size: 15px;
+  line-height: 15px;
   transition: transform 180ms ease;
 }
 
@@ -407,7 +412,7 @@ body {
     14px
     calc(var(--index-highlight-indent) + var(--index-item-text-extra-indent));
   font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 10px;
+  font-size: 15px;
   line-height: 16px;
   font-weight: 300;
   color: var(--ink);
@@ -453,6 +458,8 @@ body {
 .index-item-label {
   display: inline-block;
   min-width: 0;
+  font-size: 15px;
+  line-height: 15px;
   transition: transform 180ms ease;
 }
 
@@ -555,6 +562,19 @@ body {
   display: none;
 }
 
+.archive-app:not(.is-panel-expanded) .detail-scroll::before {
+  position: sticky;
+  top: 0;
+  z-index: 18;
+  display: block;
+  height: var(--hero-top-space);
+  margin-left: calc(var(--hero-sticky-width) + var(--hero-text-frame-gap));
+  margin-bottom: calc(var(--hero-top-space) * -1);
+  background: var(--paper);
+  content: "";
+  pointer-events: none;
+}
+
 .archive-app.is-panel-expanded .detail-scroll {
   overflow: hidden;
 }
@@ -602,6 +622,10 @@ body {
 }
 
 .project-panel:first-child::after {
+  display: none;
+}
+
+.archive-app.is-panel-expanded .project-panel.is-expanded::after {
   display: none;
 }
 
@@ -653,6 +677,7 @@ body {
   align-items: start;
   flex: 0 0 auto;
   min-height: 0;
+  padding-top: 15px;
   transition:
     grid-template-columns var(--panel-expand-motion),
     column-gap var(--panel-expand-motion),
@@ -716,7 +741,7 @@ body {
 
 .archive-app:not(.is-panel-expanded) .project-panel--hero .panel-number-column {
   position: sticky;
-  top: 15px;
+  top: var(--hero-top-space);
 }
 
 .archive-app.is-panel-expanded .project-panel--hero .panel-number-column {
@@ -785,7 +810,7 @@ body {
   position: relative;
   width: 100%;
   padding-top: var(--hero-top-space);
-  padding-bottom: var(--project-bottom-gap);
+  padding-bottom: 0;
   padding-right: 0;
   grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
   column-gap: var(--hero-text-frame-gap);
@@ -909,7 +934,7 @@ body {
   overscroll-behavior: contain;
   pointer-events: none;
   touch-action: none;
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-frame-scroll::before,
@@ -933,11 +958,6 @@ body {
 .panel-frame-scroll::after {
   width: 1px;
   height: 34px;
-}
-
-.project-panel.is-expanded .panel-frame-scroll::before,
-.project-panel.is-expanded .panel-frame-scroll::after {
-  display: block;
 }
 
 .panel-frame-stage {
@@ -987,30 +1007,35 @@ body {
 
 .panel-frame--project-embed {
   min-height: var(--panel-frame-min-height);
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-frame-scroll--project-embed {
+  display: block;
+  height: var(--panel-frame-min-height);
   min-height: var(--panel-frame-min-height);
+  max-height: var(--panel-frame-min-height);
   overflow: hidden;
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-project-embed {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: var(--panel-frame-min-height);
   min-height: var(--panel-frame-min-height);
-  background: #fff;
+  max-height: var(--panel-frame-min-height);
+  background: var(--paper);
 }
 
 .panel-project-embed-frame {
   display: block;
   width: 100%;
-  height: 100%;
+  height: var(--panel-frame-min-height);
   min-height: var(--panel-frame-min-height);
+  max-height: var(--panel-frame-min-height);
   border: 0;
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-project-embed-wheel-layer {
@@ -1028,7 +1053,7 @@ body {
 .panel-frame--gallery-flow {
   min-height: var(--panel-frame-min-height);
   overflow: hidden;
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-frame-scroll--gallery-flow {
@@ -1038,7 +1063,7 @@ body {
   max-height: var(--panel-frame-min-height);
   overflow-x: hidden;
   overflow-y: hidden;
-  background: #fff;
+  background: var(--paper);
 }
 
 .panel-frame-flow {
@@ -1067,12 +1092,18 @@ body {
   height: auto;
 }
 
-.archive-app:not(.is-panel-expanded) .project-panel[data-project="01"] .panel-frame-flow-hero {
+.archive-app:not(.is-panel-expanded) .project-panel--hero .panel-frame-shell {
   position: sticky;
-  top: 0;
+  top: var(--detail-sticky-top);
+  z-index: 6;
+  align-self: start;
 }
 
-.archive-app.is-panel-expanded .project-panel[data-project="01"] .panel-frame-flow-hero {
+.archive-app:not(.is-panel-expanded) .panel-project-embed-wheel-layer {
+  display: block;
+}
+
+.archive-app.is-panel-expanded .panel-frame-shell--project-embed {
   position: relative;
   top: auto;
 }
@@ -1088,7 +1119,7 @@ body {
   height: auto;
   max-height: none;
   min-width: 0;
-  padding: 0 0 8px;
+  padding: 0 20px 8px 0;
   overflow: hidden;
   background: var(--paper);
   opacity: 0;
@@ -1336,6 +1367,7 @@ body {
 }
 
 .project-panel.is-expanded .panel-frame-scroll--project-embed {
+  max-height: none;
   overflow: hidden;
 }
 
@@ -1360,6 +1392,7 @@ body {
 .project-panel.is-expanded .panel-project-embed-frame {
   height: var(--panel-expanded-frame-height);
   min-height: var(--panel-expanded-frame-height);
+  max-height: var(--panel-expanded-frame-height);
 }
 
 .project-panel.is-expanded .panel-project-embed-wheel-layer {
@@ -1580,6 +1613,14 @@ body {
 
   .archive-detail {
     padding: 20px 15px 10px 20px;
+  }
+
+  :root {
+    --detail-sticky-top: calc(1px + 20px + 20px + 12px + 1px + var(--hero-top-space));
+  }
+
+  .archive-app:not(.is-panel-expanded) .detail-scroll::before {
+    margin-left: 0;
   }
 
   .panel-body {

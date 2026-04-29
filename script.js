@@ -16,6 +16,7 @@ const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-
 const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
+const PANEL_RESET_ANIMATION_MS = 420;
 
 let panelOffsets = [];
 let visibleProjectId = "";
@@ -90,6 +91,13 @@ function resetEmbeddedProjectScroll(panel) {
   }
 
   try {
+    embedFrame.contentWindow.postMessage(
+      {
+        type: "project-scroll-to-top",
+      },
+      "*",
+    );
+
     if (typeof embedFrame.contentWindow.projectViewport?.scrollToTop === "function") {
       embedFrame.contentWindow.projectViewport.scrollToTop();
     } else {
@@ -108,6 +116,87 @@ function resetPanelContentScroll(panel) {
   }
 
   panel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function animateElementScrollToTop(element, duration = PANEL_RESET_ANIMATION_MS) {
+  if (!element) {
+    return Promise.resolve(false);
+  }
+
+  const start = element.scrollTop;
+
+  if (start <= 1) {
+    element.scrollTo({ top: 0, behavior: "auto" });
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    const startTime = window.performance.now();
+
+    const tick = (timestamp) => {
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+      element.scrollTop = start * (1 - eased);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(tick);
+        return;
+      }
+
+      element.scrollTop = 0;
+      resolve(true);
+    };
+
+    window.requestAnimationFrame(tick);
+  });
+}
+
+async function animateEmbeddedProjectScrollToTop(panel, duration = PANEL_RESET_ANIMATION_MS) {
+  const embedFrame = panel?.querySelector(".panel-project-embed-frame");
+
+  if (!embedFrame?.contentWindow) {
+    return false;
+  }
+
+  try {
+    if (typeof embedFrame.contentWindow.projectViewport?.animateToTop === "function") {
+      await embedFrame.contentWindow.projectViewport.animateToTop(duration);
+      return true;
+    }
+
+    embedFrame.contentWindow.postMessage(
+      {
+        type: "project-scroll-to-top",
+        behavior: "smooth",
+        duration,
+      },
+      "*",
+    );
+
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, duration);
+    });
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function animatePanelContentReset(panel, duration = PANEL_RESET_ANIMATION_MS) {
+  if (await animateEmbeddedProjectScrollToTop(panel, duration)) {
+    return true;
+  }
+
+  return animateElementScrollToTop(panel?.querySelector(".panel-frame-scroll"), duration);
+}
+
+function schedulePanelContentReset(panel) {
+  if (!panel) {
+    return;
+  }
+
+  window.setTimeout(() => resetPanelContentScroll(panel), PANEL_RESET_ANIMATION_MS + 40);
 }
 
 function postScrollToEmbeddedProject(panel, deltaY) {
@@ -138,10 +227,16 @@ async function syncExpandedProject(projectId = "") {
 
   if (expandedProjectId) {
     const previousPanel = panelByProject.get(expandedProjectId);
+
+    if (!projectId) {
+      animatePanelContentReset(previousPanel);
+    }
+
     previousPanel?.classList.remove("is-expanded");
     previousPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "false");
     previousPanel?.querySelector(".panel-side-copy")?.setAttribute("aria-hidden", "true");
     if (!projectId) {
+      schedulePanelContentReset(previousPanel);
       deferPanelCopyUntilCollapseEnds(previousPanel);
     }
   }
@@ -379,10 +474,10 @@ projectEmbedFrames.forEach((embedFrame) => {
   embedFrame.addEventListener("load", () => {
     const parentPanel = embedFrame.closest(".project-panel");
 
-    if (parentPanel?.classList.contains("is-expanded")) {
-      resetPanelContentScroll(parentPanel);
-    }
+    resetEmbeddedProjectScroll(parentPanel);
   });
+
+  resetEmbeddedProjectScroll(embedFrame.closest(".project-panel"));
 });
 
 projectEmbedWheelLayers.forEach((wheelLayer) => {
