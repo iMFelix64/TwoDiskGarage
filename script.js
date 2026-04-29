@@ -12,6 +12,7 @@ const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle
 const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
 const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll"));
 const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
+const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
@@ -80,6 +81,34 @@ function cancelDeferredPanelCopy(panel) {
   panel?.classList.remove("is-copy-deferred");
 }
 
+function resetEmbeddedProjectScroll(panel) {
+  const embedFrame = panel?.querySelector(".panel-project-embed-frame");
+
+  if (!embedFrame?.contentWindow) {
+    return false;
+  }
+
+  try {
+    if (typeof embedFrame.contentWindow.projectViewport?.scrollToTop === "function") {
+      embedFrame.contentWindow.projectViewport.scrollToTop();
+    } else {
+      embedFrame.contentWindow.scrollTo({ top: 0, behavior: "auto" });
+    }
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function resetPanelContentScroll(panel) {
+  if (resetEmbeddedProjectScroll(panel)) {
+    return;
+  }
+
+  panel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+}
+
 async function syncExpandedProject(projectId = "") {
   if (expandedProjectId === projectId) {
     return;
@@ -103,7 +132,7 @@ async function syncExpandedProject(projectId = "") {
     nextPanel?.classList.add("is-expanded");
     nextPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "true");
     nextPanel?.querySelector(".panel-side-copy")?.setAttribute("aria-hidden", "false");
-    nextPanel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+    resetPanelContentScroll(nextPanel);
     nextPanel?.querySelector(".panel-frame-scroll")?.focus();
   }
 
@@ -318,6 +347,16 @@ panelFrames.forEach((panelFrame) => {
 
 frameShells.forEach((frameShell) => {
   frameShell.addEventListener("wheel", syncExpandedFrameWheel, { passive: false });
+});
+
+projectEmbedFrames.forEach((embedFrame) => {
+  embedFrame.addEventListener("load", () => {
+    const parentPanel = embedFrame.closest(".project-panel");
+
+    if (parentPanel?.classList.contains("is-expanded")) {
+      resetPanelContentScroll(parentPanel);
+    }
+  });
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
