@@ -11,6 +11,7 @@ const projectToggle = document.getElementById("index-project-toggle");
 const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle"));
 const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
 const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll"));
+const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 
@@ -20,8 +21,6 @@ let selectedProjectId = "";
 let expandedProjectId = "";
 let ticking = false;
 const collapseCopyTimers = new Map();
-const frameImageSizeCache = new Map();
-const frameTransitionMs = 300;
 
 function syncSelectedProject(selectedId) {
   if (selectedProjectId === selectedId) {
@@ -81,173 +80,9 @@ function cancelDeferredPanelCopy(panel) {
   panel?.classList.remove("is-copy-deferred");
 }
 
-function extractBackgroundImageUrl(backgroundImage) {
-  const match = backgroundImage.match(/url\(["']?(.+?)["']?\)/);
-
-  return match?.[1] || "";
-}
-
-function loadFrameImageSize(url) {
-  if (!url) {
-    return Promise.resolve(null);
-  }
-
-  if (frameImageSizeCache.has(url)) {
-    return frameImageSizeCache.get(url);
-  }
-
-  const imageSizePromise = new Promise((resolve) => {
-    const image = new Image();
-
-    image.onload = () => {
-      resolve({
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-      });
-    };
-    image.onerror = () => resolve(null);
-    image.src = url;
-  });
-
-  frameImageSizeCache.set(url, imageSizePromise);
-  return imageSizePromise;
-}
-
-function parsePositionValue(value, axis) {
-  if (!value || value === "center") {
-    return 0.5;
-  }
-
-  if (axis === "x") {
-    if (value === "left") {
-      return 0;
-    }
-
-    if (value === "right") {
-      return 1;
-    }
-  }
-
-  if (axis === "y") {
-    if (value === "top") {
-      return 0;
-    }
-
-    if (value === "bottom") {
-      return 1;
-    }
-  }
-
-  if (value.endsWith("%")) {
-    return Number.parseFloat(value) / 100;
-  }
-
-  return 0.5;
-}
-
-function parseFrameImagePosition(position) {
-  const parts = position.trim().split(/\s+/);
-  const [x = "center", y = "center"] = parts;
-
-  return {
-    x: parsePositionValue(x, "x"),
-    y: parsePositionValue(y, "y"),
-  };
-}
-
-function parseFrameImageSize(size, viewportWidth, viewportHeight, naturalSize) {
-  const [rawWidth = "auto", rawHeight = "auto"] = size.trim().split(/\s+/);
-  const aspectRatio = naturalSize.width / naturalSize.height;
-
-  if (rawWidth === "auto" && rawHeight.endsWith("%")) {
-    const height = viewportHeight * (Number.parseFloat(rawHeight) / 100);
-    return {
-      width: height * aspectRatio,
-      height,
-    };
-  }
-
-  if (rawHeight === "auto" && rawWidth.endsWith("%")) {
-    const width = viewportWidth * (Number.parseFloat(rawWidth) / 100);
-    return {
-      width,
-      height: width / aspectRatio,
-    };
-  }
-
-  if (rawWidth.endsWith("px") && rawHeight.endsWith("px")) {
-    return {
-      width: Number.parseFloat(rawWidth),
-      height: Number.parseFloat(rawHeight),
-    };
-  }
-
-  if (rawWidth === "cover" || size === "cover") {
-    const scale = Math.max(viewportWidth / naturalSize.width, viewportHeight / naturalSize.height);
-
-    return {
-      width: naturalSize.width * scale,
-      height: naturalSize.height * scale,
-    };
-  }
-
-  const height = viewportHeight;
-
-  return {
-    width: height * aspectRatio,
-    height,
-  };
-}
-
-async function freezeFrameImageToCurrentViewport(panel) {
-  const stage = panel?.querySelector(".panel-frame-stage--curtain");
-
-  if (!stage) {
-    return;
-  }
-
-  const computedStyle = window.getComputedStyle(stage);
-  const imageUrl = extractBackgroundImageUrl(computedStyle.backgroundImage);
-  const naturalSize = await loadFrameImageSize(imageUrl);
-
-  if (!naturalSize) {
-    return;
-  }
-
-  const stageRect = stage.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const imageSize = parseFrameImageSize(
-    computedStyle.backgroundSize,
-    viewportWidth,
-    viewportHeight,
-    naturalSize,
-  );
-  const position = parseFrameImagePosition(computedStyle.backgroundPosition);
-  const viewportOffsetX = (viewportWidth - imageSize.width) * position.x;
-  const viewportOffsetY = (viewportHeight - imageSize.height) * position.y;
-
-  panel.style.setProperty("--project-frame-image-size-frozen", `${imageSize.width}px ${imageSize.height}px`);
-  panel.style.setProperty(
-    "--project-frame-image-position-frozen",
-    `${viewportOffsetX - stageRect.left}px ${viewportOffsetY - stageRect.top}px`,
-  );
-  panel.classList.add("is-frame-image-frozen");
-}
-
-function releaseFrameImageFreeze(panel) {
-  panel?.classList.remove("is-frame-image-frozen");
-  panel?.style.removeProperty("--project-frame-image-size-frozen");
-  panel?.style.removeProperty("--project-frame-image-position-frozen");
-}
-
 async function syncExpandedProject(projectId = "") {
   if (expandedProjectId === projectId) {
     return;
-  }
-
-  if (projectId) {
-    await freezeFrameImageToCurrentViewport(panelByProject.get(projectId));
   }
 
   if (expandedProjectId) {
@@ -255,10 +90,8 @@ async function syncExpandedProject(projectId = "") {
     previousPanel?.classList.remove("is-expanded");
     previousPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "false");
     previousPanel?.querySelector(".panel-side-copy")?.setAttribute("aria-hidden", "true");
-
     if (!projectId) {
       deferPanelCopyUntilCollapseEnds(previousPanel);
-      window.setTimeout(() => releaseFrameImageFreeze(previousPanel), frameTransitionMs);
     }
   }
 
@@ -270,8 +103,8 @@ async function syncExpandedProject(projectId = "") {
     nextPanel?.classList.add("is-expanded");
     nextPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "true");
     nextPanel?.querySelector(".panel-side-copy")?.setAttribute("aria-hidden", "false");
-    nextPanel?.querySelector(".panel-frame")?.scrollTo({ top: 0, behavior: "auto" });
-    nextPanel?.querySelector(".panel-frame")?.focus();
+    nextPanel?.querySelector(".panel-frame-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+    nextPanel?.querySelector(".panel-frame-scroll")?.focus();
   }
 
   archiveApp?.classList.toggle("is-panel-expanded", Boolean(expandedProjectId));
@@ -384,16 +217,17 @@ function applyDebugLabels() {
 }
 
 function syncExpandedFrameWheel(event) {
-  const frameElement = event.currentTarget;
-  const parentPanel = frameElement.closest(".project-panel");
+  const frameLayer = event.currentTarget;
+  const parentPanel = frameLayer.closest(".project-panel");
+  const frameScroll = parentPanel?.querySelector(".panel-frame-scroll");
 
-  if (!parentPanel?.classList.contains("is-expanded")) {
+  if (!parentPanel?.classList.contains("is-expanded") || !frameScroll) {
     return;
   }
 
   event.preventDefault();
   event.stopPropagation();
-  frameElement.scrollTop += event.deltaY;
+  frameScroll.scrollTop += event.deltaY;
 }
 
 indexItems.forEach((item) => {
@@ -473,9 +307,17 @@ expandToggles.forEach((toggle) => {
   });
 });
 
+frameScrolls.forEach((frameScroll) => {
+  frameScroll.tabIndex = -1;
+  frameScroll.addEventListener("wheel", syncExpandedFrameWheel, { passive: false });
+});
+
 panelFrames.forEach((panelFrame) => {
-  panelFrame.tabIndex = -1;
   panelFrame.addEventListener("wheel", syncExpandedFrameWheel, { passive: false });
+});
+
+frameShells.forEach((frameShell) => {
+  frameShell.addEventListener("wheel", syncExpandedFrameWheel, { passive: false });
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");

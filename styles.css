@@ -33,28 +33,13 @@
   --panel-expanded-card-height: 150px;
 
   /* 项目展开后右侧说明栏固定宽度 */
-  --panel-expanded-side-width: 300px;
+  --panel-expanded-side-width: 286px;
 
   /* 展开后 frame 与右侧说明栏之间的固定间距 */
-  --panel-expanded-side-gap: 15px;
-
-  /* 左侧目录收起、编号卡片缩小后释放出来的横向空间 */
-  --panel-expanded-released-width: calc(
-    var(--index-column-width) + var(--project-number-width) + var(--panel-copy-width) +
-      var(--hero-number-text-gap) - var(--panel-expanded-card-width)
-  );
-
-  /* 让 frame 和右侧说明栏作为一组平移，而不是改变右侧说明栏宽度 */
-  --panel-expanded-body-offset: calc(
-    var(--panel-expanded-released-width) - var(--panel-expanded-side-width) -
-      var(--panel-expanded-side-gap)
-  );
+  --panel-expanded-side-gap: 10px;
 
   /* 文字说明区域宽度，值越大，文字区越宽，右侧 frame 会相应变窄 */
   --panel-copy-width: 260px;
-
-  /* 每个项目额外增加的整体高度，值越大，单个项目在滚动里停留越久 */
-  --panel-extra-height: 520px;
 
   /* 项目顶部留白，上下分割线与内容的呼吸感主要由它控制 */
   --hero-top-space: 15px;
@@ -68,11 +53,20 @@
   /* frame 顶部白色遮罩条的高度 */
   --frame-top-box-height: 15px;
 
-  /* frame 的最小高度，想把右侧画面整体拉高就改这里 */
-  --panel-frame-min-height: 600px;
+  /* frame 的基础高度，跟随浏览器可视高度自适应 */
+  --panel-frame-min-height: calc(100dvh - 82px);
 
-  /* 项目展开后 frame 的固定可视高度，内部内容会在这个窗口里滚动 */
-  --panel-expanded-frame-height: 600px;
+  /* 项目展开后 frame 的可视高度，同样跟随浏览器可视高度自适应 */
+  --panel-expanded-frame-height: calc(100dvh - 82px);
+
+  /* 展开后主图和后续附加内容之间的间距 */
+  --panel-frame-gallery-gap: 36px;
+
+  /* 项目 01 独立图片流容器宽度 */
+  --project-01-flow-width: 920px;
+
+  /* 主图的统一导出比例，当前项目 01 是 1350 x 900，也就是 3:2 */
+  --project-frame-aspect-ratio: 3 / 2;
 
   /* 文字高亮卡片描边颜色 */
   --panel-highlight-border: rgba(18, 18, 18, 0.12);
@@ -106,6 +100,13 @@
 
   /* 项目卡片展开/收起的统一动效 */
   --panel-expand-motion: 300ms ease;
+
+  /* 项目主布局切换的动效，用于卡片和 frame 同步变形 */
+  --panel-layout-motion: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* 卡片内容自身收缩速度 */
+  --panel-card-motion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
 }
 
 /* 项目图片控制区
@@ -486,7 +487,7 @@ body {
   min-width: 0;
   height: 100%;
   margin-left: var(--index-column-width);
-  padding: 24px 10px 15px 10px;
+  padding: 24px 10px 0 10px;
   overflow: hidden;
   background: var(--paper);
   transition: margin-left var(--panel-expand-motion);
@@ -563,13 +564,14 @@ body {
 }
 
 .project-panel {
+  --project-bottom-gap: 15px;
   position: relative;
   display: grid;
   grid-template-columns: var(--project-number-width) minmax(0, 1fr);
   column-gap: 0;
   align-items: stretch;
-  min-height: calc(100dvh - 82px + var(--panel-extra-height));
-  padding-bottom: 18px;
+  min-height: 0;
+  padding-bottom: var(--project-bottom-gap);
 }
 
 .archive-app.is-panel-expanded .project-panel {
@@ -578,8 +580,13 @@ body {
 
 .archive-app.is-panel-expanded .project-panel.is-expanded {
   display: grid;
-  min-height: calc(100dvh - 82px);
+  min-height: auto;
   padding-bottom: 0;
+}
+
+.archive-app.is-panel-expanded .panel-content {
+  height: auto;
+  min-height: 0;
 }
 
 .project-panel::after {
@@ -599,13 +606,14 @@ body {
 }
 
 .project-panel:last-child {
+  --project-bottom-gap: 0px;
   padding-bottom: 0;
 }
 
 .project-panel::before {
   position: absolute;
   top: 0;
-  bottom: 18px;
+  bottom: var(--project-bottom-gap);
   left: 0;
   width: var(--project-number-width);
   background: var(--paper);
@@ -618,30 +626,38 @@ body {
 }
 
 .panel-number-column {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 9;
   align-self: start;
   min-height: 0;
-  padding-top: 8px;
-  background: var(--paper);
+  padding-top: 0;
+  background: transparent;
+  overflow: hidden;
+  transition:
+    width var(--panel-expand-motion),
+    padding-top var(--panel-expand-motion);
 }
 
 .panel-content {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: calc(100dvh - 100px);
+  height: auto;
+  min-height: 0;
   min-width: 0;
 }
 
 .panel-body {
   display: grid;
-  grid-template-columns: minmax(170px, var(--panel-copy-width)) minmax(0, 1fr);
-  column-gap: 24px;
-  align-items: stretch;
-  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 0;
+  align-items: start;
+  flex: 0 0 auto;
   min-height: 0;
+  transition:
+    grid-template-columns var(--panel-expand-motion),
+    column-gap var(--panel-expand-motion),
+    padding-top var(--panel-expand-motion),
+    padding-bottom var(--panel-expand-motion);
 }
 
 .panel-copy {
@@ -679,23 +695,33 @@ body {
 .project-panel--hero {
   --hero-sticky-offset: 0px;
   --hero-sticky-width: calc(var(--project-number-width) + var(--hero-number-text-gap) + var(--panel-copy-width));
-  grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
-  column-gap: var(--hero-text-frame-gap);
-  padding-bottom: var(--hero-top-space);
-  transition: grid-template-columns var(--panel-expand-motion);
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 0;
+  padding-bottom: var(--project-bottom-gap);
+  transition: grid-template-columns var(--panel-layout-motion);
 }
 
 .project-panel--hero::before {
-  width: var(--hero-sticky-width);
-  transition: width var(--panel-expand-motion);
+  display: none;
 }
 
 .project-panel--hero .panel-number-column {
-  top: var(--hero-sticky-offset);
   display: block;
+  grid-column: 1;
+  align-self: start;
   width: var(--hero-sticky-width);
-  padding-top: var(--hero-top-space);
-  transition: width var(--panel-expand-motion);
+  padding-top: 0;
+  transition: width var(--panel-layout-motion);
+}
+
+.archive-app:not(.is-panel-expanded) .project-panel--hero .panel-number-column {
+  position: sticky;
+  top: 15px;
+}
+
+.archive-app.is-panel-expanded .project-panel--hero .panel-number-column {
+  position: relative;
+  top: auto;
 }
 
 .panel-highlight-card {
@@ -705,6 +731,7 @@ body {
   column-gap: var(--hero-number-text-gap);
   align-items: start;
   width: 100%;
+  min-width: 0;
   height: var(--panel-highlight-min-height);
   min-height: 0;
   border: 0;
@@ -720,7 +747,9 @@ body {
   overflow: hidden;
   text-align: left;
   transition:
-    height var(--panel-expand-motion),
+    grid-template-columns var(--panel-card-motion),
+    height var(--panel-card-motion),
+    padding var(--panel-card-motion),
     background-color 320ms ease,
     box-shadow 320ms ease,
     transform 320ms ease;
@@ -754,24 +783,30 @@ body {
 
 .project-panel--hero .panel-body {
   position: relative;
-  width: calc(100% + var(--panel-expanded-side-width) + var(--panel-expanded-side-gap));
-  padding-top: 0;
-  grid-template-columns: minmax(0, 1fr) var(--panel-expanded-side-width);
-  column-gap: var(--panel-expanded-side-gap);
-  align-items: stretch;
+  width: 100%;
+  padding-top: var(--hero-top-space);
+  padding-bottom: var(--project-bottom-gap);
+  padding-right: 0;
+  grid-template-columns: var(--hero-sticky-width) minmax(0, 1fr);
+  column-gap: var(--hero-text-frame-gap);
+  align-items: start;
   justify-items: stretch;
   min-height: 0;
-  transition: width var(--panel-expand-motion);
+  transition:
+    grid-template-columns var(--panel-layout-motion),
+    column-gap var(--panel-layout-motion),
+    padding-top var(--panel-layout-motion),
+    padding-bottom var(--panel-layout-motion),
+    padding-right var(--panel-layout-motion);
 }
 
-.project-panel--hero .panel-frame {
-  grid-column: 1;
-  grid-row: 1;
-  height: 100%;
+.project-panel--hero .panel-frame-shell {
+  grid-column: 2;
 }
 
 .project-panel--hero .panel-copy {
   position: static;
+  min-width: 0;
   max-width: var(--panel-copy-width);
   padding-top: 0;
   padding-right: 0;
@@ -849,27 +884,27 @@ body {
 }
 
 .panel-frame-top-box {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  display: block;
-  grid-column: 1;
-  grid-row: 1;
-  align-self: start;
-  width: 100%;
-  height: var(--frame-top-box-height);
-  background: var(--paper);
-  pointer-events: none;
+  display: none;
 }
 
 .panel-frame-shell {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: auto;
   min-width: 0;
+  margin-bottom: 0;
+  transition:
+    width var(--panel-layout-motion),
+    margin-bottom var(--panel-layout-motion);
 }
 
 .panel-frame-scroll {
   position: relative;
-  height: auto;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
   min-height: var(--panel-frame-min-height);
   overscroll-behavior: contain;
   pointer-events: none;
@@ -906,8 +941,10 @@ body {
 }
 
 .panel-frame-stage {
-  flex: 1 0 auto;
-  min-height: var(--panel-frame-min-height);
+  flex: none;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: var(--project-frame-aspect-ratio);
   background-color: var(--placeholder);
 }
 
@@ -917,12 +954,6 @@ body {
   background-size: var(--project-frame-image-size, cover);
   background-repeat: no-repeat;
   background-attachment: fixed;
-}
-
-.project-panel.is-frame-image-frozen .panel-frame-stage--curtain {
-  background-position: var(--project-frame-image-position-frozen, var(--project-frame-image-position, center));
-  background-size: var(--project-frame-image-size-frozen, var(--project-frame-image-size, cover));
-  background-attachment: scroll;
 }
 
 .panel-frame-gallery {
@@ -950,25 +981,79 @@ body {
   height: auto;
 }
 
-.panel-side-copy {
+.panel-frame-shell--gallery-flow {
+  margin-bottom: calc(var(--project-bottom-gap) * -1);
+}
+
+.panel-frame--gallery-flow {
+  min-height: var(--panel-frame-min-height);
+  overflow: hidden;
+  background: #fff;
+}
+
+.panel-frame-scroll--gallery-flow {
+  display: block;
+  height: var(--panel-frame-min-height);
+  min-height: var(--panel-frame-min-height);
+  max-height: var(--panel-frame-min-height);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background: #fff;
+}
+
+.panel-frame-flow {
+  display: grid;
+  gap: 18px;
   width: 100%;
+  margin: 0;
+  padding: 0 0 32px;
+}
+
+.panel-frame-flow-hero {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.panel-frame-flow-hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.panel-frame-flow-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.archive-app:not(.is-panel-expanded) .project-panel[data-project="01"] .panel-frame-flow-hero {
+  position: sticky;
+  top: 0;
+}
+
+.archive-app.is-panel-expanded .project-panel[data-project="01"] .panel-frame-flow-hero {
+  position: relative;
+  top: auto;
+}
+
+.panel-side-copy {
+  position: absolute;
+  top: var(--hero-top-space);
+  right: 0;
+  display: block;
+  width: var(--panel-expanded-side-width);
   height: auto;
   max-height: none;
   min-width: 0;
-  opacity: 0;
+  padding: 0 5px;
   overflow: hidden;
-  transform: translateX(48px);
-  pointer-events: none;
-  transition:
-    opacity 280ms ease,
-    transform 420ms ease;
-}
-
-.panel-side-copy::before {
-  display: block;
-  height: var(--frame-top-box-height);
   background: var(--paper);
-  content: "";
+  opacity: 0;
+  transform: translateX(calc(100% + 24px));
+  transition:
+    opacity var(--panel-layout-motion),
+    transform var(--panel-layout-motion);
 }
 
 .panel-side-copy h3 {
@@ -1025,13 +1110,16 @@ body {
   background-size: 42px 100%, auto;
 }
 
-.frame-earth-explorer {
+.frame-earth-explorer,
+.frame-earth-explorer-stage {
   background-color: var(--placeholder);
-  background-image: url("./Assets/Images/Earth Explorer-01.jpeg");
+  background-image: url("./Assets/Project 01/1-EARTH EXPLORER 01.jpg");
 }
 
 .frame-earth-explorer::before,
-.frame-earth-explorer::after {
+.frame-earth-explorer::after,
+.frame-earth-explorer-stage::before,
+.frame-earth-explorer-stage::after {
   display: none;
 }
 
@@ -1070,7 +1158,7 @@ body {
 }
 
 .project-panel.is-expanded .panel-number-column {
-  width: var(--hero-sticky-width);
+  width: var(--panel-expanded-card-width);
 }
 
 .project-panel.is-expanded .panel-highlight-card {
@@ -1117,42 +1205,72 @@ body {
 }
 
 .project-panel.is-expanded .panel-body {
-  width: calc(100% - var(--panel-expanded-body-offset));
-  grid-template-columns: minmax(0, 1fr) var(--panel-expanded-side-width);
-  column-gap: var(--panel-expanded-side-gap);
-  height: 100%;
+  width: 100%;
+  padding-right: calc(var(--panel-expanded-side-width) + var(--panel-expanded-side-gap));
+  grid-template-columns:
+    var(--panel-expanded-card-width)
+    minmax(0, 1fr);
+  column-gap: var(--hero-text-frame-gap);
+  height: auto;
+  align-items: start;
 }
 
-.project-panel.is-expanded .panel-frame-shell,
-.project-panel.is-expanded .panel-frame {
-  height: 100%;
-  min-height: 100%;
+.project-panel.is-expanded .panel-frame-shell {
+  grid-column: 2;
+}
+
+.project-panel.is-expanded .panel-frame-shell {
+  height: auto;
+  min-height: 0;
 }
 
 .project-panel.is-expanded .panel-frame {
-  overflow-y: auto;
+  height: var(--panel-expanded-frame-height);
+  min-height: var(--panel-expanded-frame-height);
+}
+
+.project-panel.is-expanded .panel-frame {
+  overflow: hidden;
 }
 
 .project-panel.is-expanded .panel-frame-scroll {
+  height: 100%;
   min-height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
   pointer-events: auto;
   touch-action: pan-y;
+  scrollbar-width: none;
 }
 
-.project-panel.is-expanded .panel-frame-stage {
-  min-height: var(--panel-frame-min-height);
-}
-
-.project-panel.is-expanded .panel-frame-stage--curtain {
-  background-attachment: scroll;
+.project-panel.is-expanded .panel-frame-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .project-panel.is-expanded .panel-frame-gallery {
   max-height: none;
   opacity: 1;
   overflow: visible;
-  padding-top: 18px;
+  padding-top: var(--panel-frame-gallery-gap);
+}
+
+.project-panel.is-expanded .panel-frame--gallery-flow {
+  height: var(--panel-frame-min-height);
+  min-height: var(--panel-frame-min-height);
+}
+
+.project-panel.is-expanded .panel-frame-scroll--gallery-flow {
+  height: var(--panel-frame-min-height);
+  min-height: var(--panel-frame-min-height);
+  max-height: var(--panel-frame-min-height);
+  overflow-y: auto;
+  pointer-events: auto;
+  touch-action: pan-y;
+  scrollbar-width: none;
+}
+
+.project-panel.is-expanded .panel-frame-scroll--gallery-flow::-webkit-scrollbar {
+  display: none;
 }
 
 .project-panel.is-expanded .panel-side-copy {
@@ -1376,7 +1494,7 @@ body {
 
   .project-panel--hero {
     --hero-number-text-gap: 10px;
-    --hero-text-frame-gap: 10px;
+    --hero-text-frame-gap: 8px;
   }
 
   .project-panel--hero .panel-copy h2 {

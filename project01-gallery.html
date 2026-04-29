@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project 01 Gallery</title>
+    <style>
+      :root {
+        --gallery-width: 920px;
+        --page-bg: #f3f3f0;
+        --panel-bg: #ffffff;
+        --rule: rgba(18, 18, 18, 0.9);
+        --text: #121212;
+        --muted: rgba(18, 18, 18, 0.62);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--text);
+        background: var(--page-bg);
+      }
+
+      .page {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: grid;
+        gap: 16px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--rule);
+        background: rgba(243, 243, 240, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .toolbar h1 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .toolbar-copy {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .control-row {
+        display: grid;
+        grid-template-columns: auto minmax(180px, 320px) auto;
+        gap: 12px;
+        align-items: center;
+        width: fit-content;
+      }
+
+      .control-row label,
+      .control-row output {
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .control-row input[type="range"] {
+        width: 100%;
+      }
+
+      .viewer {
+        padding: 24px;
+      }
+
+      .scroll-shell {
+        height: calc(100vh - 150px);
+        overflow-y: auto;
+        border: 1px solid var(--rule);
+        background: var(--panel-bg);
+      }
+
+      .gallery {
+        width: min(var(--gallery-width), 100%);
+        margin: 0 auto;
+        padding: 24px 0 32px;
+      }
+
+      .gallery-image {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .gallery-image + .gallery-image {
+        margin-top: 18px;
+      }
+
+      @media (max-width: 720px) {
+        .viewer {
+          padding: 16px;
+        }
+
+        .scroll-shell {
+          height: calc(100vh - 166px);
+        }
+
+        .gallery {
+          padding: 16px 0 24px;
+        }
+
+        .control-row {
+          grid-template-columns: 1fr;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="toolbar">
+        <h1>Project 01 / Scroll Gallery</h1>
+        <p class="toolbar-copy">
+          这个页面是独立可滚动容器。拖动下面的滑块可以直接调整图片容器宽度。
+        </p>
+        <div class="control-row">
+          <label for="gallery-width">容器宽度</label>
+          <input
+            id="gallery-width"
+            type="range"
+            min="420"
+            max="1400"
+            step="10"
+            value="920"
+          />
+          <output id="gallery-width-value" for="gallery-width">920px</output>
+        </div>
+      </header>
+
+      <main class="viewer">
+        <section class="scroll-shell" aria-label="Project 01 image scroller">
+          <div class="gallery">
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 01.jpg"
+              alt="Earth Explorer 01"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 02.jpg"
+              alt="Earth Explorer 02"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 03.jpg"
+              alt="Earth Explorer 03"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 04.jpg"
+              alt="Earth Explorer 04"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 05.jpg"
+              alt="Earth Explorer 05"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 06.jpg"
+              alt="Earth Explorer 06"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 07.jpg"
+              alt="Earth Explorer 07"
+            />
+            <img
+              class="gallery-image"
+              src="./Assets/Project 01/1-EARTH EXPLORER 08.jpg"
+              alt="Earth Explorer 08"
+            />
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const widthInput = document.querySelector("#gallery-width");
+      const widthValue = document.querySelector("#gallery-width-value");
+
+      function syncGalleryWidth() {
+        const width = `${widthInput.value}px`;
+        document.documentElement.style.setProperty("--gallery-width", width);
+        widthValue.textContent = width;
+      }
+
+      widthInput.addEventListener("input", syncGalleryWidth);
+      syncGalleryWidth();
+    </script>
+  </body>
+</html>
