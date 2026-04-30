@@ -5,6 +5,10 @@ const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
 const labelToggle = document.getElementById("label-toggle");
+const homeTransitionStage = document.getElementById("home-transition-stage");
+const homeIntro = document.getElementById("home-intro");
+const homeIntroLetters = Array.from(document.querySelectorAll(".home-intro-letter"));
+const homeCursorAsset = "./Assets/Icons/Arrow.svg";
 const homeButton = document.getElementById("index-home-button");
 const projectGroup = document.getElementById("index-project-group");
 const projectToggle = document.getElementById("index-project-toggle");
@@ -17,13 +21,408 @@ const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-pro
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 const PANEL_RESET_ANIMATION_MS = 420;
+const HOME_INTRO_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=?<>[]{}\\/|";
+const HOME_FLOAT_ASSETS = [
+  "./Assets/Home/截屏2026-04-30 11.27.38 1.png",
+  "./Assets/Home/截屏2026-04-30 11.27.51 1.png",
+  "./Assets/Home/截屏2026-04-30 11.28.06 1.png",
+  "./Assets/Home/截屏2026-04-30 11.28.15 1.png",
+  "./Assets/Home/截屏2026-04-30 11.28.34 1.png",
+  "./Assets/Home/截屏2026-04-30 11.29.14 1.png",
+  "./Assets/Home/截屏2026-04-30 11.29.33 1.png",
+  "./Assets/Home/截屏2026-04-30 11.31.59 1.png",
+  "./Assets/Home/截屏2026-04-30 11.32.21 1.png",
+];
+const HOME_FLOAT_ANCHORS = [
+  [7, 10],
+  [76, 8],
+  [12, 30],
+  [78, 30],
+  [5, 55],
+  [84, 54],
+  [14, 78],
+  [60, 80],
+  [88, 76],
+];
+const HOME_TYPE_START_DELAY = 160;
+const HOME_TYPE_LETTER_DELAY = 90;
+const HOME_TYPE_SCRAMBLE_DURATION = 230;
+const HOME_EXIT_DELAY = 520;
 
 let panelOffsets = [];
 let visibleProjectId = "";
 let selectedProjectId = "";
 let expandedProjectId = "";
 let ticking = false;
+let isHomeIntroPrepared = false;
 const collapseCopyTimers = new Map();
+const homeIntroScrambleTimers = new Map();
+let homeFloatLayer = null;
+let homeCursor = null;
+let homeCursorX = window.innerWidth / 2;
+let homeCursorY = window.innerHeight / 2;
+let isHomeCursorImageHover = false;
+let homeCursorTurnTimer = null;
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function shuffledItems(items) {
+  const nextItems = [...items];
+
+  for (let index = nextItems.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [nextItems[index], nextItems[swapIndex]] = [nextItems[swapIndex], nextItems[index]];
+  }
+
+  return nextItems;
+}
+
+function randomHomeIntroGlyph() {
+  return HOME_INTRO_GLYPHS[Math.floor(Math.random() * HOME_INTRO_GLYPHS.length)];
+}
+
+function startHomeIntroScramble(letter) {
+  if (homeIntroScrambleTimers.has(letter)) {
+    return;
+  }
+
+  letter.classList.add("is-scrambling");
+  letter.textContent = randomHomeIntroGlyph();
+
+  const timer = window.setInterval(() => {
+    letter.textContent = randomHomeIntroGlyph();
+  }, 46);
+
+  homeIntroScrambleTimers.set(letter, timer);
+}
+
+function stopHomeIntroScramble(letter) {
+  const timer = homeIntroScrambleTimers.get(letter);
+
+  if (timer) {
+    window.clearInterval(timer);
+    homeIntroScrambleTimers.delete(letter);
+  }
+
+  letter.classList.remove("is-scrambling");
+  letter.textContent = letter.dataset.letter || "";
+  letter.classList.add("is-revealed");
+}
+
+function buildHomeFloatLayer() {
+  if (!homeIntro || homeFloatLayer) {
+    return;
+  }
+
+  homeFloatLayer = document.createElement("div");
+  homeFloatLayer.className = "home-float-layer";
+  homeFloatLayer.setAttribute("aria-hidden", "true");
+
+  HOME_FLOAT_ASSETS.forEach((assetPath) => {
+    const item = document.createElement("div");
+    const image = document.createElement("img");
+
+    item.className = "home-float-item";
+    image.className = "home-float-image";
+    image.src = assetPath;
+    image.alt = "";
+    image.loading = "eager";
+    image.decoding = "async";
+
+    item.addEventListener("mouseenter", () => {
+      homeIntro.classList.add("is-cursor-image-hover");
+    });
+    item.addEventListener("mouseleave", () => {
+      homeIntro.classList.remove("is-cursor-image-hover");
+    });
+
+    item.append(image);
+    homeFloatLayer.append(item);
+  });
+
+  homeIntro.prepend(homeFloatLayer);
+}
+
+function buildHomeCursor() {
+  if (!homeIntro || homeCursor) {
+    return;
+  }
+
+  homeCursor = document.createElement("div");
+  const cursorInner = document.createElement("div");
+  const cursorArrowShell = document.createElement("div");
+  const cursorArrow = document.createElement("img");
+
+  homeCursor.className = "home-custom-cursor";
+  homeCursor.setAttribute("aria-hidden", "true");
+  cursorInner.className = "home-custom-cursor-inner";
+  cursorArrowShell.className = "home-custom-cursor-arrow-shell";
+  cursorArrow.className = "home-custom-cursor-arrow";
+  cursorArrow.src = homeCursorAsset;
+  cursorArrow.alt = "";
+  cursorArrow.decoding = "async";
+
+  cursorArrowShell.append(cursorArrow);
+  cursorInner.append(cursorArrowShell);
+  homeCursor.append(cursorInner);
+  homeIntro.append(homeCursor);
+}
+
+function syncHomeCursorPosition() {
+  if (!homeCursor) {
+    return;
+  }
+
+  homeCursor.style.setProperty("--cursor-x", `${homeCursorX}px`);
+  homeCursor.style.setProperty("--cursor-y", `${homeCursorY}px`);
+}
+
+function syncHomeCursorHoverTarget() {
+  if (!homeIntro) {
+    return;
+  }
+
+  const hoveredElement = document.elementFromPoint(homeCursorX, homeCursorY);
+  const isLetterHover = Boolean(hoveredElement?.closest(".home-intro-letter"));
+  const isTurnHover = Boolean(hoveredElement?.closest(".home-float-item"));
+
+  homeIntro.classList.toggle("is-cursor-letter-hover", isLetterHover);
+
+  if (isTurnHover === isHomeCursorImageHover) {
+    return;
+  }
+
+  window.clearTimeout(homeCursorTurnTimer);
+  homeIntro.classList.remove("is-cursor-image-hover", "is-cursor-image-unhover");
+
+  if (isTurnHover) {
+    homeIntro.classList.add("is-cursor-image-hover");
+  } else {
+    homeIntro.classList.add("is-cursor-image-unhover");
+    homeCursorTurnTimer = window.setTimeout(() => {
+      homeIntro.classList.remove("is-cursor-image-unhover");
+    }, 360);
+  }
+
+  isHomeCursorImageHover = isTurnHover;
+}
+
+function revealHomeFloatItems() {
+  if (!homeFloatLayer) {
+    return;
+  }
+
+  Array.from(homeFloatLayer.children).forEach((item, index) => {
+    item.classList.remove("is-loaded");
+
+    window.setTimeout(
+      () => {
+        item.classList.add("is-loaded");
+      },
+      160 + index * 85 + randomBetween(0, 90),
+    );
+  });
+}
+
+function layoutHomeFloatItems() {
+  if (!homeFloatLayer) {
+    return;
+  }
+
+  const anchors = shuffledItems(HOME_FLOAT_ANCHORS);
+  const items = Array.from(homeFloatLayer.children);
+
+  items.forEach((item, index) => {
+    const [anchorX, anchorY] = anchors[index % anchors.length];
+    const left = Math.max(0, Math.min(88, anchorX + randomBetween(-3, 3)));
+    const top = Math.max(3, Math.min(82, anchorY + randomBetween(-4, 4)));
+
+    item.style.setProperty("--float-left", `${left}%`);
+    item.style.setProperty("--float-top", `${top}%`);
+    item.style.setProperty(
+      "--float-width",
+      `clamp(${randomBetween(81, 114).toFixed(1)}px, ${randomBetween(10.8, 16.2).toFixed(2)}vw, ${randomBetween(240, 330).toFixed(1)}px)`,
+    );
+    item.style.setProperty("--float-x", `${randomBetween(-18, 18)}px`);
+    item.style.setProperty("--float-y", `${randomBetween(-16, 16)}px`);
+    item.style.setProperty("--float-rotate-start", `${randomBetween(-3, 3)}deg`);
+    item.style.setProperty("--float-rotate-end", `${randomBetween(-4, 4)}deg`);
+    item.style.setProperty("--float-duration", `${randomBetween(9, 16)}s`);
+    item.style.setProperty("--float-delay", `${randomBetween(-10, 0)}s`);
+  });
+
+  revealHomeFloatItems();
+}
+
+function finishHomeIntro({ immediate = false } = {}) {
+  if (!homeIntro) {
+    return;
+  }
+
+  homeIntro.classList.add("is-exiting");
+  homeTransitionStage?.classList.add("is-index-visible");
+
+  window.setTimeout(
+    () => {
+      homeIntro.hidden = true;
+      homeIntro.inert = true;
+      archiveApp?.removeAttribute("aria-hidden");
+
+      if (archiveApp) {
+        archiveApp.inert = false;
+      }
+    },
+    immediate ? 0 : 760,
+  );
+}
+
+function prepareHomeIntro() {
+  if (!homeIntro || homeIntroLetters.length === 0) {
+    return false;
+  }
+
+  if (isHomeIntroPrepared) {
+    return true;
+  }
+
+  buildHomeFloatLayer();
+  buildHomeCursor();
+  syncHomeCursorPosition();
+
+  homeIntroLetters.forEach((letter) => {
+    const { width } = letter.getBoundingClientRect();
+
+    if (letter.dataset.letter === "I") {
+      const diskLine = letter.closest(".home-intro-line");
+      const widthReference = diskLine?.querySelector('.home-intro-letter[data-letter="S"]');
+      const scrambleWidth = widthReference?.getBoundingClientRect().width || width;
+
+      letter.style.removeProperty("--letter-width");
+      letter.style.setProperty("--i-scramble-width", `${scrambleWidth}px`);
+    } else {
+      letter.style.setProperty("--letter-width", `${width}px`);
+    }
+
+    letter.textContent = "";
+    letter.addEventListener("mouseenter", () => startHomeIntroScramble(letter));
+    letter.addEventListener("mouseleave", () => stopHomeIntroScramble(letter));
+    letter.addEventListener("focus", () => startHomeIntroScramble(letter));
+    letter.addEventListener("blur", () => stopHomeIntroScramble(letter));
+  });
+
+  isHomeIntroPrepared = true;
+  return true;
+}
+
+function playHomeIntro({ autoExit = true, immediate = false } = {}) {
+  if (!prepareHomeIntro()) {
+    return;
+  }
+
+  layoutHomeFloatItems();
+
+  homeIntro.hidden = false;
+  homeIntro.inert = false;
+  window.clearTimeout(homeCursorTurnTimer);
+  isHomeCursorImageHover = false;
+  homeIntro.classList.remove(
+    "is-complete",
+    "is-exiting",
+    "is-cursor-image-hover",
+    "is-cursor-image-unhover",
+    "is-cursor-letter-hover",
+  );
+  homeIntro.classList.add("is-intro-ready");
+  homeTransitionStage?.classList.remove("is-index-visible");
+
+  if (archiveApp) {
+    archiveApp.inert = true;
+    archiveApp.setAttribute("aria-hidden", "true");
+  }
+
+  homeIntroLetters.forEach((letter) => {
+    const timer = homeIntroScrambleTimers.get(letter);
+
+    if (timer) {
+      window.clearInterval(timer);
+      homeIntroScrambleTimers.delete(letter);
+    }
+
+    letter.classList.remove("is-revealed", "is-scrambling");
+    letter.textContent = "";
+  });
+
+  if (immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    homeIntroLetters.forEach((letter) => stopHomeIntroScramble(letter));
+    homeIntro.classList.add("is-complete");
+    if (autoExit) {
+      finishHomeIntro({ immediate: true });
+    }
+    return;
+  }
+
+  homeIntroLetters.forEach((letter, index) => {
+    window.setTimeout(() => {
+      startHomeIntroScramble(letter);
+
+      window.setTimeout(() => {
+        stopHomeIntroScramble(letter);
+      }, HOME_TYPE_SCRAMBLE_DURATION);
+    }, HOME_TYPE_START_DELAY + index * HOME_TYPE_LETTER_DELAY);
+  });
+
+  const introDuration =
+    HOME_TYPE_START_DELAY +
+    (homeIntroLetters.length - 1) * HOME_TYPE_LETTER_DELAY +
+    HOME_TYPE_SCRAMBLE_DURATION;
+
+  window.setTimeout(() => {
+    homeIntro.classList.add("is-complete");
+  }, introDuration);
+
+  if (autoExit) {
+    window.setTimeout(() => {
+      finishHomeIntro();
+    }, introDuration + HOME_EXIT_DELAY);
+  }
+}
+
+function initializeHomeIntro() {
+  playHomeIntro();
+}
+
+homeIntro?.addEventListener("mousemove", (event) => {
+  homeCursorX = event.clientX;
+  homeCursorY = event.clientY;
+  homeIntro.classList.add("is-cursor-visible");
+  syncHomeCursorPosition();
+  syncHomeCursorHoverTarget();
+});
+
+homeIntro?.addEventListener("mouseenter", () => {
+  homeIntro.classList.add("is-cursor-visible");
+});
+
+homeIntro?.addEventListener("mouseleave", () => {
+  window.clearTimeout(homeCursorTurnTimer);
+  isHomeCursorImageHover = false;
+  homeIntro.classList.remove(
+    "is-cursor-visible",
+    "is-cursor-image-hover",
+    "is-cursor-image-unhover",
+    "is-cursor-letter-hover",
+  );
+});
+
+homeIntro?.addEventListener("click", () => {
+  if (!homeIntro.classList.contains("is-complete")) {
+    return;
+  }
+
+  finishHomeIntro();
+});
 
 function syncSelectedProject(selectedId) {
   if (selectedProjectId === selectedId) {
@@ -450,13 +849,14 @@ detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true })
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("load", refreshMeasurements);
 
-homeButton?.addEventListener("click", () => {
+homeButton?.addEventListener("click", async () => {
   syncSelectedProject(projectPanels[0]?.dataset.project || "01");
-  syncExpandedProject("");
+  await syncExpandedProject("");
   detailScroll?.scrollTo({
     top: 0,
-    behavior: "smooth",
+    behavior: "auto",
   });
+  playHomeIntro({ autoExit: false });
 });
 
 projectToggle?.addEventListener("click", () => {
@@ -555,6 +955,7 @@ projectEmbedWheelLayers.forEach((wheelLayer) => {
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
+initializeHomeIntro();
 applyDebugLabels();
 refreshMeasurements();
 syncDebugToggle();

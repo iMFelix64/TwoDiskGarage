@@ -24,17 +24,169 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.home-main-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--paper);
+}
+
 .home-stage {
-  position: relative;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   border: 0;
+  background: var(--paper);
+  transition: transform 760ms cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: transform;
+}
+
+.home-stage.is-exiting {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+.home-float-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.home-float-item {
+  position: absolute;
+  left: var(--float-left);
+  top: var(--float-top);
+  width: var(--float-width);
+  animation: homeFloatDrift var(--float-duration) ease-in-out var(--float-delay) infinite alternate;
+  cursor: inherit;
+  will-change: transform;
+}
+
+.home-float-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 520ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.home-float-item.is-loaded .home-float-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.home-float-item.is-loaded:hover .home-float-image {
+  transform: scale(1.07);
+}
+
+.home-stage.is-complete,
+.home-stage.is-complete * {
+  cursor: none;
+}
+
+.home-custom-cursor {
+  --cursor-size: 72px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--cursor-x, 50vw), var(--cursor-y, 50vh), 0) translate(-50%, -50%);
+  transition: opacity 120ms ease;
+  will-change: transform, opacity;
+}
+
+.home-custom-cursor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #efefef;
+  transform: scale(1);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.home-custom-cursor-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scale(0.58);
+}
+
+.home-custom-cursor-arrow-shell {
+  display: grid;
+  place-items: center;
+  translate: 0 0;
+}
+
+.home-custom-cursor-arrow {
+  width: 34px;
+  height: auto;
+  opacity: 1;
+  rotate: 90deg;
+  transition:
+    opacity 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    rotate 320ms cubic-bezier(0.2, 1, 0.22, 1);
+}
+
+.home-stage.is-complete.is-cursor-visible .home-custom-cursor {
+  opacity: 1;
+}
+
+.home-stage.is-cursor-letter-hover .home-custom-cursor::before {
+  transform: scale(0.42);
+}
+
+.home-stage.is-cursor-letter-hover .home-custom-cursor-arrow {
+  opacity: 0;
+}
+
+.home-stage.is-complete .home-custom-cursor-inner {
+  animation: homeCursorPop 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.home-stage.is-complete:not(.is-cursor-image-hover):not(.is-cursor-image-unhover):not(.is-cursor-letter-hover) .home-custom-cursor-arrow-shell {
+  animation: homeCursorArrowDrop 680ms cubic-bezier(0.2, 1, 0.22, 1) 110ms both;
+}
+
+.home-stage.is-cursor-image-hover .home-custom-cursor-arrow {
+  animation: homeCursorArrowTurnUpLeft 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-stage.is-cursor-image-unhover .home-custom-cursor-arrow {
+  animation: homeCursorArrowTurnDown 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .logo-mark {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -47,6 +199,68 @@ body {
   letter-spacing: -0.055em;
   text-transform: uppercase;
   user-select: none;
+}
+
+@keyframes homeFloatDrift {
+  from {
+    transform: translate3d(0, 0, 0) rotate(var(--float-rotate-start));
+  }
+
+  to {
+    transform: translate3d(var(--float-x), var(--float-y), 0) rotate(var(--float-rotate-end));
+  }
+}
+
+@keyframes homeCursorPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.56);
+  }
+
+  72% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes homeCursorArrowDrop {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  42% {
+    translate: 0 8px;
+  }
+
+  68% {
+    translate: 0 -2px;
+  }
+}
+
+@keyframes homeCursorArrowTurnUpLeft {
+  from {
+    rotate: 90deg;
+  }
+
+  to {
+    rotate: -135deg;
+  }
+}
+
+@keyframes homeCursorArrowTurnDown {
+  from {
+    rotate: -135deg;
+  }
+
+  to {
+    rotate: 90deg;
+  }
 }
 
 .logo-line {
@@ -73,10 +287,18 @@ body {
     transform 120ms ease;
 }
 
+.home-stage.is-intro-ready .logo-letter:not(.is-revealed):not(.is-scrambling) {
+  color: transparent;
+}
+
 .logo-letter:hover,
 .logo-letter:focus-visible,
 .logo-letter.is-scrambling {
   background: var(--accent);
+}
+
+.logo-letter[data-letter="I"].is-scrambling {
+  width: var(--i-scramble-width, auto);
 }
 
 .logo-letter:focus-visible {
@@ -91,6 +313,12 @@ body {
 
   .logo-letter {
     height: 0.82em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-stage {
+    transition: none;
   }
 }
 
