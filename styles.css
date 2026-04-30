@@ -369,7 +369,7 @@ body.debug-labels [data-debug-label]:hover > .debug-name-badge {
 }
 
 .home-intro.is-complete:not(.is-cursor-image-hover):not(.is-cursor-image-unhover):not(.is-cursor-letter-hover) .home-custom-cursor-arrow-shell {
-  animation: homeCursorArrowDrop 680ms cubic-bezier(0.2, 1, 0.22, 1) 110ms both;
+  animation: homeCursorArrowDrop 1000ms cubic-bezier(0.2, 1, 0.22, 1) infinite both;
 }
 
 .home-intro.is-cursor-image-hover .home-custom-cursor-arrow {
@@ -378,6 +378,121 @@ body.debug-labels [data-debug-label]:hover > .debug-name-badge {
 
 .home-intro.is-cursor-image-unhover .home-custom-cursor-arrow {
   animation: homeCursorArrowTurnDown 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.archive-frame-cursor {
+  --cursor-size: 72px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--cursor-x, 50vw), var(--cursor-y, 50vh), 0) translate(-50%, -50%);
+  transition: opacity 120ms ease;
+  will-change: transform, opacity;
+}
+
+.archive-frame-cursor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #efefef;
+}
+
+.archive-frame-cursor-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transform: scale(0.72);
+}
+
+.archive-frame-cursor-arrow-shell {
+  display: grid;
+  place-items: center;
+  translate: 0 0;
+}
+
+.archive-frame-cursor-arrow {
+  display: block;
+  width: 48px;
+  height: auto;
+}
+
+body.is-archive-frame-cursor-active .archive-frame-cursor {
+  opacity: 1;
+}
+
+.archive-frame-cursor.is-bouncing .archive-frame-cursor-arrow-shell {
+  animation: archiveFrameCursorArrowBounceRight 1000ms cubic-bezier(0.2, 1, 0.22, 1) infinite both;
+}
+
+.project-embed-scroll-cursor {
+  --cursor-size: 72px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--cursor-x, 50vw), var(--cursor-y, 50vh), 0) translate(-50%, -50%);
+  transition: opacity 120ms ease;
+  will-change: transform, opacity;
+}
+
+.project-embed-scroll-cursor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #efefef;
+}
+
+.project-embed-scroll-cursor-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.project-embed-scroll-cursor-arrow-shell {
+  display: grid;
+  place-items: center;
+  translate: 0 0;
+}
+
+.project-embed-scroll-cursor-arrow {
+  display: block;
+  width: 34px;
+  height: auto;
+  rotate: 90deg;
+}
+
+body.is-project-embed-scroll-cursor-active .project-embed-scroll-cursor {
+  opacity: 1;
+}
+
+body.is-project-embed-scroll-cursor-active .project-embed-scroll-cursor-arrow-shell {
+  animation: homeCursorArrowDrop 1000ms cubic-bezier(0.2, 1, 0.22, 1) infinite both;
 }
 
 .home-intro-logo {
@@ -437,6 +552,21 @@ body.debug-labels [data-debug-label]:hover > .debug-name-badge {
 
   68% {
     translate: 0 -2px;
+  }
+}
+
+@keyframes archiveFrameCursorArrowBounceRight {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  42% {
+    translate: 8px 0;
+  }
+
+  68% {
+    translate: -2px 0;
   }
 }
 
@@ -1076,6 +1206,7 @@ body {
 
 .panel-number-column:hover .panel-highlight-card,
 .panel-number-column:focus-within .panel-highlight-card,
+.archive-app:not(.is-panel-expanded) .project-panel.is-frame-cursor-hover .panel-highlight-card,
 .panel-highlight-card:hover,
 .panel-highlight-card:focus-within {
   background: var(--panel-highlight-active);
@@ -1095,6 +1226,7 @@ body {
 
 .panel-number-column:hover .panel-highlight-arrow,
 .panel-number-column:focus-within .panel-highlight-arrow,
+.archive-app:not(.is-panel-expanded) .project-panel.is-frame-cursor-hover .panel-highlight-arrow,
 .panel-highlight-card:hover .panel-highlight-arrow,
 .panel-highlight-card:focus-within .panel-highlight-arrow {
   transform: rotate(0deg);
@@ -1410,6 +1542,10 @@ body {
   max-height: none;
 }
 
+.archive-app:not(.is-panel-expanded) .panel-frame--project-embed {
+  cursor: none;
+}
+
 .archive-app:not(.is-panel-expanded) .panel-project-embed-wheel-layer {
   display: block;
 }
@@ -1709,6 +1845,10 @@ body {
 
 .project-panel.is-expanded .panel-project-embed-wheel-layer {
   display: block;
+}
+
+body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-project-embed-wheel-layer {
+  cursor: none;
 }
 
 .project-panel.is-expanded .panel-frame-scroll--gallery-flow {

@@ -14,6 +14,7 @@ const projectGroup = document.getElementById("index-project-group");
 const projectToggle = document.getElementById("index-project-toggle");
 const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle"));
 const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
+const projectEmbedPanelFrames = Array.from(document.querySelectorAll(".panel-frame--project-embed"));
 const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll"));
 const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
@@ -21,6 +22,8 @@ const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-pro
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 const PANEL_RESET_ANIMATION_MS = 420;
+const HOME_RETURN_SCROLL_MS = 760;
+const HOME_RETURN_OVERLAP_MS = 180;
 const HOME_INTRO_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=?<>[]{}\\/|";
 const HOME_FLOAT_ASSETS = [
   "./Assets/Home/截屏2026-04-30 11.27.38 1.png",
@@ -53,6 +56,7 @@ let panelOffsets = [];
 let visibleProjectId = "";
 let selectedProjectId = "";
 let expandedProjectId = "";
+let listNavigationTargetId = "";
 let ticking = false;
 let isHomeIntroPrepared = false;
 const collapseCopyTimers = new Map();
@@ -63,6 +67,14 @@ let homeCursorX = window.innerWidth / 2;
 let homeCursorY = window.innerHeight / 2;
 let isHomeCursorImageHover = false;
 let homeCursorTurnTimer = null;
+let archiveFrameCursor = null;
+let archiveFrameCursorX = window.innerWidth / 2;
+let archiveFrameCursorY = window.innerHeight / 2;
+let archiveFrameCursorPanel = null;
+let projectEmbedScrollCursor = null;
+let projectEmbedScrollCursorX = window.innerWidth / 2;
+let projectEmbedScrollCursorY = window.innerHeight / 2;
+let projectEmbedScrollCursorLayer = null;
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
@@ -207,6 +219,234 @@ function syncHomeCursorHoverTarget() {
   }
 
   isHomeCursorImageHover = isTurnHover;
+}
+
+function buildArchiveFrameCursor() {
+  if (archiveFrameCursor) {
+    return;
+  }
+
+  archiveFrameCursor = document.createElement("div");
+  const cursorInner = document.createElement("div");
+  const cursorArrowShell = document.createElement("div");
+  const cursorArrow = document.createElement("img");
+
+  archiveFrameCursor.className = "archive-frame-cursor";
+  archiveFrameCursor.setAttribute("aria-hidden", "true");
+  cursorInner.className = "archive-frame-cursor-inner";
+  cursorArrowShell.className = "archive-frame-cursor-arrow-shell";
+  cursorArrow.className = "archive-frame-cursor-arrow";
+  cursorArrow.src = homeCursorAsset;
+  cursorArrow.alt = "";
+  cursorArrow.decoding = "async";
+
+  cursorArrowShell.append(cursorArrow);
+  cursorInner.append(cursorArrowShell);
+  archiveFrameCursor.append(cursorInner);
+  document.body.append(archiveFrameCursor);
+}
+
+function syncArchiveFrameCursorPosition() {
+  if (!archiveFrameCursor) {
+    return;
+  }
+
+  archiveFrameCursor.style.setProperty("--cursor-x", `${archiveFrameCursorX}px`);
+  archiveFrameCursor.style.setProperty("--cursor-y", `${archiveFrameCursorY}px`);
+}
+
+function syncArchiveFrameCursorPanel(panel) {
+  if (archiveFrameCursorPanel === panel) {
+    return;
+  }
+
+  archiveFrameCursorPanel?.classList.remove("is-frame-cursor-hover");
+  archiveFrameCursorPanel = panel;
+  archiveFrameCursorPanel?.classList.add("is-frame-cursor-hover");
+}
+
+function showArchiveFrameCursor(event) {
+  if (!shouldShowArchiveFrameCursor()) {
+    hideArchiveFrameCursor();
+    return;
+  }
+
+  syncArchiveFrameCursorPanel(event.target.closest(".project-panel"));
+  buildArchiveFrameCursor();
+
+  archiveFrameCursorX = event.clientX;
+  archiveFrameCursorY = event.clientY;
+  syncArchiveFrameCursorPosition();
+
+  document.body.classList.add("is-archive-frame-cursor-active");
+  archiveFrameCursor.classList.remove("is-bouncing");
+  void archiveFrameCursor.offsetWidth;
+  archiveFrameCursor.classList.add("is-bouncing");
+}
+
+function moveArchiveFrameCursor(event) {
+  archiveFrameCursorX = event.clientX;
+  archiveFrameCursorY = event.clientY;
+  syncArchiveFrameCursorPosition();
+}
+
+function hideArchiveFrameCursor() {
+  document.body.classList.remove("is-archive-frame-cursor-active");
+  archiveFrameCursor?.classList.remove("is-bouncing");
+  syncArchiveFrameCursorPanel(null);
+}
+
+function shouldShowArchiveFrameCursor() {
+  return archiveApp && !archiveApp.classList.contains("is-panel-expanded");
+}
+
+function isArchiveFrameCursorTarget(target) {
+  return (
+    shouldShowArchiveFrameCursor() &&
+    target instanceof Element &&
+    Boolean(target.closest(".panel-frame--project-embed"))
+  );
+}
+
+function syncArchiveFrameCursorFromPointer(event) {
+  if (!isArchiveFrameCursorTarget(event.target)) {
+    hideArchiveFrameCursor();
+    return;
+  }
+
+  if (!document.body.classList.contains("is-archive-frame-cursor-active")) {
+    showArchiveFrameCursor(event);
+    return;
+  }
+
+  moveArchiveFrameCursor(event);
+}
+
+function buildProjectEmbedScrollCursor() {
+  if (projectEmbedScrollCursor) {
+    return;
+  }
+
+  projectEmbedScrollCursor = document.createElement("div");
+  const cursorInner = document.createElement("div");
+  const cursorArrowShell = document.createElement("div");
+  const cursorArrow = document.createElement("img");
+
+  projectEmbedScrollCursor.className = "project-embed-scroll-cursor";
+  projectEmbedScrollCursor.setAttribute("aria-hidden", "true");
+  cursorInner.className = "project-embed-scroll-cursor-inner";
+  cursorArrowShell.className = "project-embed-scroll-cursor-arrow-shell";
+  cursorArrow.className = "project-embed-scroll-cursor-arrow";
+  cursorArrow.src = homeCursorAsset;
+  cursorArrow.alt = "";
+  cursorArrow.decoding = "async";
+
+  cursorArrowShell.append(cursorArrow);
+  cursorInner.append(cursorArrowShell);
+  projectEmbedScrollCursor.append(cursorInner);
+  document.body.append(projectEmbedScrollCursor);
+}
+
+function syncProjectEmbedScrollCursorPosition() {
+  if (!projectEmbedScrollCursor) {
+    return;
+  }
+
+  projectEmbedScrollCursor.style.setProperty("--cursor-x", `${projectEmbedScrollCursorX}px`);
+  projectEmbedScrollCursor.style.setProperty("--cursor-y", `${projectEmbedScrollCursorY}px`);
+}
+
+function getProjectEmbedScrollState(wheelLayer) {
+  const parentPanel = wheelLayer?.closest(".project-panel");
+  const embedFrame = parentPanel?.querySelector(".panel-project-embed-frame");
+
+  try {
+    const viewportState = embedFrame?.contentWindow?.projectViewport?.getScrollState?.();
+
+    if (viewportState) {
+      return viewportState;
+    }
+
+    const projectPage = embedFrame?.contentDocument?.querySelector(".project-page");
+
+    if (!projectPage) {
+      return {
+        isAtBottom: true,
+        isReady: false,
+      };
+    }
+
+    const maxScrollTop = Math.max(0, projectPage.scrollHeight - projectPage.clientHeight);
+
+    return {
+      isAtBottom: projectPage.scrollTop >= maxScrollTop - 2,
+      isReady: true,
+      maxScrollTop,
+      scrollTop: projectPage.scrollTop,
+    };
+  } catch (error) {
+    return {
+      isAtBottom: true,
+      isReady: false,
+    };
+  }
+}
+
+function shouldShowProjectEmbedScrollCursor(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const wheelLayer = target.closest(".panel-project-embed-wheel-layer");
+
+  if (!wheelLayer?.closest(".project-panel.is-expanded")) {
+    return false;
+  }
+
+  return !getProjectEmbedScrollState(wheelLayer).isAtBottom;
+}
+
+function showProjectEmbedScrollCursor(event) {
+  projectEmbedScrollCursorX = event.clientX;
+  projectEmbedScrollCursorY = event.clientY;
+  syncProjectEmbedScrollCursorPosition();
+
+  refreshProjectEmbedScrollCursor(event.target.closest(".panel-project-embed-wheel-layer"));
+}
+
+function moveProjectEmbedScrollCursor(event) {
+  projectEmbedScrollCursorX = event.clientX;
+  projectEmbedScrollCursorY = event.clientY;
+  syncProjectEmbedScrollCursorPosition();
+  refreshProjectEmbedScrollCursor(event.target.closest(".panel-project-embed-wheel-layer"));
+}
+
+function hideProjectEmbedScrollCursor() {
+  document.body.classList.remove("is-project-embed-scroll-cursor-active");
+  projectEmbedScrollCursorLayer = null;
+}
+
+function blurPanelInteractionFocus(panel) {
+  const activeElement = document.activeElement;
+
+  if (activeElement instanceof HTMLElement && panel?.contains(activeElement)) {
+    activeElement.blur();
+  }
+}
+
+function refreshProjectEmbedScrollCursor(wheelLayer = projectEmbedScrollCursorLayer) {
+  if (
+    !wheelLayer?.closest(".project-panel.is-expanded") ||
+    getProjectEmbedScrollState(wheelLayer).isAtBottom
+  ) {
+    hideProjectEmbedScrollCursor();
+    return;
+  }
+
+  buildProjectEmbedScrollCursor();
+  projectEmbedScrollCursorLayer = wheelLayer;
+  syncProjectEmbedScrollCursorPosition();
+  document.body.classList.add("is-project-embed-scroll-cursor-active");
 }
 
 function revealHomeFloatItems() {
@@ -443,6 +683,11 @@ function syncVisibleProject(visibleId) {
   panelByProject.get(visibleProjectId)?.classList.remove("is-active");
   panelByProject.get(visibleId)?.classList.add("is-active");
 
+  if (!listNavigationTargetId || listNavigationTargetId === visibleId) {
+    listNavigationTargetId = "";
+    syncSelectedProject(visibleId);
+  }
+
   if (currentProject) {
     currentProject.textContent = visibleId;
   }
@@ -659,6 +904,9 @@ async function syncExpandedProject(projectId = "") {
     return;
   }
 
+  hideArchiveFrameCursor();
+  hideProjectEmbedScrollCursor();
+
   if (expandedProjectId) {
     const previousPanel = panelByProject.get(expandedProjectId);
 
@@ -672,6 +920,7 @@ async function syncExpandedProject(projectId = "") {
     if (!projectId) {
       schedulePanelContentReset(previousPanel);
       deferPanelCopyUntilCollapseEnds(previousPanel);
+      blurPanelInteractionFocus(previousPanel);
     }
   }
 
@@ -829,7 +1078,10 @@ indexItems.forEach((item) => {
   }
 
   const scrollToPanel = () => {
-    syncSelectedProject(item.dataset.project);
+    const targetProjectId = item.dataset.project;
+
+    listNavigationTargetId = targetProjectId === visibleProjectId ? "" : targetProjectId;
+    syncSelectedProject(targetProjectId);
     targetPanel.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -846,17 +1098,41 @@ indexItems.forEach((item) => {
 });
 
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
+document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("load", refreshMeasurements);
+window.addEventListener("blur", () => {
+  hideArchiveFrameCursor();
+  hideProjectEmbedScrollCursor();
+});
 
 homeButton?.addEventListener("click", async () => {
-  syncSelectedProject(projectPanels[0]?.dataset.project || "01");
+  const firstProjectId = projectPanels[0]?.dataset.project || "01";
+  let hasStartedHome = false;
+
+  const startHomeReturn = () => {
+    if (hasStartedHome) {
+      return;
+    }
+
+    hasStartedHome = true;
+    listNavigationTargetId = "";
+    syncSelectedProject(firstProjectId);
+    syncVisibleProject(firstProjectId);
+    playHomeIntro({ autoExit: false });
+  };
+
   await syncExpandedProject("");
-  detailScroll?.scrollTo({
-    top: 0,
-    behavior: "auto",
-  });
-  playHomeIntro({ autoExit: false });
+
+  if (detailScroll && detailScroll.scrollTop > 1) {
+    const transitionLeadTime = Math.max(0, HOME_RETURN_SCROLL_MS - HOME_RETURN_OVERLAP_MS);
+    const homeReturnTimer = window.setTimeout(startHomeReturn, transitionLeadTime);
+
+    await animateElementScrollToTop(detailScroll, HOME_RETURN_SCROLL_MS);
+    window.clearTimeout(homeReturnTimer);
+  }
+
+  startHomeReturn();
 });
 
 projectToggle?.addEventListener("click", () => {
@@ -888,6 +1164,7 @@ expandToggles.forEach((toggle) => {
     const nextExpandedId = expandedProjectId === projectId ? "" : projectId;
     const isCollapsingCurrentProject = !nextExpandedId;
 
+    listNavigationTargetId = "";
     syncSelectedProject(projectId);
     syncVisibleProject(projectId);
 
@@ -907,6 +1184,20 @@ expandToggles.forEach((toggle) => {
     }
   });
 });
+
+async function expandPanelFromOverview(parentPanel) {
+  if (!parentPanel || archiveApp?.classList.contains("is-panel-expanded")) {
+    return;
+  }
+
+  const projectId = parentPanel.dataset.project;
+
+  listNavigationTargetId = "";
+  syncSelectedProject(projectId);
+  syncVisibleProject(projectId);
+  await animateDetailScrollToPanel(parentPanel);
+  await syncExpandedProject(projectId);
+}
 
 frameScrolls.forEach((frameScroll) => {
   frameScroll.tabIndex = -1;
@@ -931,7 +1222,19 @@ projectEmbedFrames.forEach((embedFrame) => {
   resetEmbeddedProjectScroll(embedFrame.closest(".project-panel"));
 });
 
+projectEmbedPanelFrames.forEach((panelFrame) => {
+  panelFrame.addEventListener("pointerenter", showArchiveFrameCursor);
+  panelFrame.addEventListener("pointermove", moveArchiveFrameCursor);
+  panelFrame.addEventListener("pointerleave", hideArchiveFrameCursor);
+  panelFrame.addEventListener("click", () => {
+    expandPanelFromOverview(panelFrame.closest(".project-panel"));
+  });
+});
+
 projectEmbedWheelLayers.forEach((wheelLayer) => {
+  wheelLayer.addEventListener("pointerenter", showProjectEmbedScrollCursor);
+  wheelLayer.addEventListener("pointermove", moveProjectEmbedScrollCursor);
+  wheelLayer.addEventListener("pointerleave", hideProjectEmbedScrollCursor);
   wheelLayer.addEventListener(
     "wheel",
     (event) => {
@@ -949,6 +1252,9 @@ projectEmbedWheelLayers.forEach((wheelLayer) => {
 
       event.preventDefault();
       event.stopPropagation();
+      projectEmbedScrollCursorX = event.clientX;
+      projectEmbedScrollCursorY = event.clientY;
+      window.setTimeout(() => refreshProjectEmbedScrollCursor(wheelLayer), 40);
     },
     { passive: false },
   );

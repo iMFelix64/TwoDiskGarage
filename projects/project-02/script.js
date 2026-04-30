@@ -45,7 +45,28 @@ function animateProjectToTop(duration = PROJECT_RESET_ANIMATION_MS) {
   });
 }
 
+function getProjectScrollState() {
+  if (!projectPage) {
+    return {
+      isAtBottom: true,
+      isReady: false,
+    };
+  }
+
+  const maxScrollTop = Math.max(0, projectPage.scrollHeight - projectPage.clientHeight);
+
+  return {
+    isAtBottom: projectPage.scrollTop >= maxScrollTop - 2,
+    isReady: true,
+    maxScrollTop,
+    scrollTop: projectPage.scrollTop,
+  };
+}
+
 window.projectViewport = {
+  getScrollState() {
+    return getProjectScrollState();
+  },
   scrollToTop(options = {}) {
     if (options?.behavior === "smooth") {
       return animateProjectToTop(options.duration);
